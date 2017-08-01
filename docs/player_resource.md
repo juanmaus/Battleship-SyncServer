@@ -10,7 +10,7 @@ This must be an authenticated request. This operations fetches for the JSON repr
 a player entity. If the provided *player_id* does exist in the system as a valid/registered
 player, then the following structure is returned:
 
-```javascript
+```json
 
 {
   "player_id":"b2853511-abd7-44a1-bd17-3747041bb31d",
