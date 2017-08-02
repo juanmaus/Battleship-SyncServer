@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # run.py
 import os
-from garnet_api import app
+from battleshipsync import app
 
 """
     Garnet API is a boilerplate application that allows you to create Python + Flask API

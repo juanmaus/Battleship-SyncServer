@@ -11,7 +11,7 @@ from flask_jwt import JWT
 # ------------------------------------------------------------------------------
 
 __version__ = '1.0'
-app = Flask('garnet_api')
+app = Flask('battleshipsync')
 app.config.from_object('config')
 app.debug = True
 
@@ -19,7 +19,7 @@ app.debug = True
 # SETUP LOGGING
 # ------------------------------------------------------------------------------
 
-handler = RotatingFileHandler('garnet_api.log', maxBytes=10000, backupCount=1)
+handler = RotatingFileHandler('battleshipsync.log', maxBytes=10000, backupCount=1)
 handler.setLevel(logging.INFO)
 app.logger.addHandler(handler)
 
@@ -33,8 +33,8 @@ db = MongoEngine(app)
 # SETUP JWT AUTHENTICATION
 # ------------------------------------------------------------------------------
 
-# Import all garnet_api controller files
-from garnet_api.controllers import *
-from garnet_api.security import idam
+# Import all battleshipsync controller files
+from battleshipsync.controllers import *
+from battleshipsync.security import idam
 
 jwt = JWT(app, idam.authenticate, idam.identity)
