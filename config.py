@@ -21,8 +21,11 @@ JWT_AUTH_URL_RULE = '/api/v1/auth'
 JWT_EXPIRATION_DELTA = datetime.timedelta(3200) # Set the token validity
 #
 # ----------------------------------------------------------------
-# SATELLITE DATABASE CONFIGURATION
+# MONGO DATABASE CONFIGURATION
 # ----------------------------------------------------------------
-# See https://flask-pymongo.readthedocs.io/en/latest/ for more
 # MongoDB configuration parameters
-MONGO_DBNAME = 'battleshipsync'
+MONGODB_DB = 'the_db_name'
+MONGODB_HOST = 'mongo_host'
+MONGODB_PORT = 57112
+MONGODB_USERNAME = 'your_username'
+MONGODB_PASSWORD = 'secrete_password_here'
