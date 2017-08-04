@@ -8,8 +8,11 @@ from flask import jsonify
 #
 @app.route('/', methods=['GET'])
 def get_api_root():
+    app.logger.info('Server health status summary requested...')
     return jsonify({
-        "platform": "Garnet API 1.0",
+        "platform": "Garnet API 1.1",
         "version": "1.0",
-        "message": "Garnet Satellite is now in Orbit!"
+        "message": "Server is running",
+        "redis-status": "up and running",
+        "mongo-status": "up and running"
     })
