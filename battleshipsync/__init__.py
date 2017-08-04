@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import logging
-from logging.handlers import RotatingFileHandler
+from battleshipsync.extensions.slack_event_handler import SlackLogHandler
 from flask import Flask
 from flask_mongoengine import MongoEngine
 from flask_jwt import JWT
+from flask_redis import FlaskRedis
 
 # ------------------------------------------------------------------------------
 # SETUP GENERAL APPLICATION
@@ -19,15 +20,25 @@ app.debug = True
 # SETUP LOGGING
 # ------------------------------------------------------------------------------
 
-handler = RotatingFileHandler('battleshipsync.log', maxBytes=10000, backupCount=1)
+# Slack/Mongo Handler
+handler = SlackLogHandler()
+print(app.config['SLACK_WEBHOOK'])
+handler.set_webhook(app.config['SLACK_WEBHOOK'])
 handler.setLevel(logging.INFO)
 app.logger.addHandler(handler)
+
 
 # ------------------------------------------------------------------------------
 # SETUP MONGO DB 
 # ------------------------------------------------------------------------------
 
 db = MongoEngine(app)
+
+# ------------------------------------------------------------------------------
+# SETUP REDIS
+# ------------------------------------------------------------------------------
+
+redis_store = FlaskRedis(app, strict=False)
 
 # ------------------------------------------------------------------------------
 # SETUP JWT AUTHENTICATION
