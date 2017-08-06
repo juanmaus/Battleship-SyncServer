@@ -1,3 +1,5 @@
+
+from http import HTTPStatus
 from battleshipsync import app
 from flask import request, jsonify
 from battleshipsync.models.account import User
@@ -50,12 +52,13 @@ def update_account_password(user_id):
                 app.logger.info('Updated password for user_id: ' + user_id)
                 return SuccessResponse('Success', 'Password updated successfully', 'EMAIL_OK').as_json()
         else:
-            app.logger.error('Permission violation. User not authorized to update other user\'s password. '+
+            app.logger.error('Permission violation. User not authorized to update other user\'s password. ' +
                              'User performing operation ' + user_id)
             return ErrorResponse('Permission violation', 'This action generated a security alert').as_json()
     except:
         app.logger.error('Invalid json received for user: %s', user_id)
-        return ErrorResponse('Could not update password', 'Invalid password provided').as_json()
+        return jsonify(ErrorResponse('Could not update password', 'Invalid password provided').get()), 400
+
 
 
 # --------------------------------------------------------------------------
