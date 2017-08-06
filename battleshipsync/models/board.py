@@ -85,11 +85,12 @@ class Board:
     __game_id = ""
     __player_id = ""
     __board_id = ""
+    __redis = None
     
     # -----------------------------------------------------------------------------------
     # CONSTRUCTOR METHOD 
     # -----------------------------------------------------------------------------------
-    def __init__(self, player_id, game_id):
+    def __init__(self, player_id, game_id, redis_store):
         """
             -----------------------------------------------------------------------------
             Creates instances of Board class
@@ -100,9 +101,35 @@ class Board:
         self.__player_id = player_id
         self.__game_id = game_id
         self.__board_id = self.__build_id()
+        self.__redis = redis_store
 
     # -----------------------------------------------------------------------------------
-    # CONSTRUCTOR BUILD ID
+    # METHOD SAVE
+    # -----------------------------------------------------------------------------------
+    def save(self):
+
+        """
+            Takes the current state of the board and saves it into the redis data structure 
+            store. If the key already exists, then it updates its value. This method is used
+            to create a board as well as an update method. 
+            :return: Nothing
+        """
+
+        self.__redis.set(self.__board_id, self.json())
+
+    # -----------------------------------------------------------------------------------
+    # METHOD JSON
+    # -----------------------------------------------------------------------------------
+    def json(self):
+        """
+            This method get the current board state as a json string
+            :return: json string representation of the current board status
+        """
+        return json.dumps(self.export_state())
+
+
+    # -----------------------------------------------------------------------------------
+    # METHOD BUILD ID
     # -----------------------------------------------------------------------------------
     def __build_id(self):
         """
@@ -175,7 +202,7 @@ class Board:
             "board": self.__board,
             "size": len(self.__board)
         }
-        return state;
+        return state
         
     # -----------------------------------------------------------------------------------
     # LOAD METHOD

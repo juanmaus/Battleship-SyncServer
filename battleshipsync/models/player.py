@@ -19,5 +19,10 @@ class PlayerType(Enum):
 # CLASS PLAYER
 # ---------------------------------------------------------------------------------------
 class Player:
-    def __init__(self):
+    """
+        A player is an instance that relates a given user of the game with an specific 
+        instance of a game. The player's id is always 
+    """
+
+    def __init__(self, player_id):
         pass
