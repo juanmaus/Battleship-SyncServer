@@ -26,10 +26,10 @@ player, then the following structure is returned:
 ```
 
 The state of this entity is maintained by the sync server and updates to ranking positions,
-games played, etc are managed directly by the backend services which means this is a 
-read-only entity. 
+games played, etc. are managed directly by the backend services which means this is a 
+read-only entity.
 
 
-Players are created automatically every time a new user is registered using the account API. 
+Players are created automatically every time a new user is registered using the account API.
 When registering a new user, the user type (human or computer) must be specified (See account
-resource for more details on regis new users). 
+resource for more details on regis new users).
