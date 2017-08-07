@@ -1,5 +1,6 @@
+from http import HTTPStatus
 from battleshipsync import app, redis_store
-from flask import request, jsonify
+from flask import request, jsonify, json
 from battleshipsync.models.account import User
 from battleshipsync.models.account import UserService
 from battleshipsync.security.idam import find_user
@@ -22,9 +23,11 @@ def post_game():
     mode = game_data['mode']
     layout = game_data['player_layout']
     owner_id = current_identity.id
-    owner = None  # TODO use owner id to create a new player
+    owner = owner_id  # TODO use owner id to create a new player
     game = Game(mode=mode, owner=owner, player_layout=layout)
-    # TODO perist game in redis and set other attributes
+    redis_store.set(game.id, str(game.as_json()))
+    return game.id
+
 
 
 # --------------------------------------------------------------------------
@@ -35,7 +38,28 @@ def post_game():
 @jwt_required()
 @enable_jsonp
 def get_game(game_id):
-    pass
+    game = redis_store.get(game_id)
+    if str(game)=='None':
+        return (ErrorResponse('Game does not exists',
+                                     'Please enter a valid game id')).as_json(), HTTPStatus.BAD_REQUEST
+    else:
+        game_serialized = json.loads(redis_store.get(game_id))
+        return game_serialized['owner']
+
+# --------------------------------------------------------------------------
+# GET GAME LIST
+# --------------------------------------------------------------------------
+# Gets a list of the current joinable games
+@app.route('/api/v1/game/', methods=['GET'])
+@jwt_required()
+@enable_jsonp
+def get_game_list():
+    keys= []
+    for key in redis_store.scan_iter(): #TODO: add filters players/type
+        # do something with the key
+        keys.append(str(key))
+    return jsonify(keys)
+
 
 
 @app.route('/api/v1/game/setBoard', methods=['POST'])
@@ -48,20 +72,5 @@ def index():
     redis_store.set(key, board)
     return "someting more usefull"
 
-##--example payaload"
 
-# {
-#             "key": "5:12",
-#             "board":[
-#                  [0,0,0,5,5,5,5,5,0,0],
-#                  [2,2,0,0,0,0,0,0,0,0],
-#                  [0,0,1,0,0,0,4,0,0,0],
-#                  [0,0,0,0,0,0,4,0,0,0],
-#                  [0,0,0,0,0,0,4,0,0,0],
-#                  [0,0,0,0,0,0,4,0,0,0],
-#                  [0,0,2,0,1,0,0,0,0,0],
-#                  [0,0,2,0,0,0,0,0,3,0],
-#                  [0,0,0,0,0,0,0,0,3,0],
-#                  [3,3,3,0,0,0,0,0,3,0]
-#              ]
-# } go on from here, resolve jwt auth problems
+

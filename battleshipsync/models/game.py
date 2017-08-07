@@ -1,4 +1,5 @@
 from enum import Enum
+from flask import json
 import datetime
 import uuid
 
@@ -60,7 +61,7 @@ class Game:
             :param player_layout: A list of the player types that can join the game. 
         """
         self.id = str(uuid.uuid4())
-        self.timestamp = datetime.datetime.now
+        self.timestamp = datetime.datetime.now()
         self.game_status = GameStatus.WAITING_FOR_PLAYERS
         self.mode = mode
         self.owner = owner
@@ -80,4 +81,20 @@ class Game:
         # TODO!!!
         self.players.append(player)
         return True
+
+    # --------------------------------------------------------------------------
+    # METHOD STR
+    # --------------------------------------------------------------------------
+    def as_json(self):
+        return json.dumps({
+            "id": self.id,
+            "timestamp": str(self.timestamp),
+            "game_status": str(self.game_status),
+            "mode": str(self.mode),
+            "owner": self.owner,
+            "moves_next": self.moves_next,
+            "player_layout": self.player_layout,
+            "players": self.players
+        })
+
 
