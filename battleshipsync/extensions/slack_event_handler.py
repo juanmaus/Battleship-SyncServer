@@ -80,4 +80,3 @@ class SlackLogHandler(logging.Handler):
             emoji=":ghost:",
             username="battleship-server"
         )
-
