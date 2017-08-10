@@ -7,6 +7,9 @@ import uuid
 # ---------------------------------------------------------------------------------------
 # ENUMERATION GAME STATUS
 # ---------------------------------------------------------------------------------------
+from battleshipsync import redis_store
+
+
 class GameStatus(Enum):
 
     """
@@ -52,6 +55,13 @@ class Game:
     """
 
     # -----------------------------------------------------------------------------------
+    # CLASS ATTRIBUTES
+    # -----------------------------------------------------------------------------------
+
+    __game_id = ""
+    __redis = redis_store
+
+    # -----------------------------------------------------------------------------------
     # CLASS CONSTRUCTOR
     # -----------------------------------------------------------------------------------
     def __init__(self, mode, owner, player_layout):
@@ -70,6 +80,29 @@ class Game:
         self.players = []
 
     # -----------------------------------------------------------------------------------
+    # METHOD SAVE
+    # -----------------------------------------------------------------------------------
+    def save(self):
+        """
+            Takes the current state of the game and saves it into the redis data structure
+            store. If the key already exists, then it updates its value. This method is used
+            to create a game as well as an update method.
+            :return: Nothing
+        """
+
+        self.__redis.set(self.id, self.json())
+
+    # -----------------------------------------------------------------------------------
+    # METHOD JSON
+    # -----------------------------------------------------------------------------------
+    def json(self):
+        """
+            This method get the game state as a json string
+            :return: json string representation of the current game status
+        """
+        return json.dumps(self.export_state(), sort_keys=False, indent=2)
+
+    # -----------------------------------------------------------------------------------
     # METHOD JOIN PLAYER
     # -----------------------------------------------------------------------------------
     def join_player(self, player):
@@ -82,11 +115,18 @@ class Game:
         self.players.append(player)
         return True
 
-    # --------------------------------------------------------------------------
-    # METHOD STR
-    # --------------------------------------------------------------------------
-    def as_json(self):
-        return json.dumps({
+
+    # -----------------------------------------------------------------------------------
+    # EXPORT_STATE METHOD
+    # -----------------------------------------------------------------------------------
+    def export_state(self):
+        """
+            -----------------------------------------------------------------------------
+            :return: dictionary containing current game's state. This can be serialized
+                     into a json string in order to persist the state on a redis instance.
+            -----------------------------------------------------------------------------
+        """
+        state = {
             "id": self.id,
             "timestamp": str(self.timestamp),
             "game_status": str(self.game_status),
@@ -95,6 +135,39 @@ class Game:
             "moves_next": self.moves_next,
             "player_layout": self.player_layout,
             "players": self.players
-        })
+        }
+        return state
 
+    # -----------------------------------------------------------------------------------
+    # LOAD METHOD
+    # -----------------------------------------------------------------------------------
+    def load(self, game_id):
 
+        """
+            -----------------------------------------------------------------------------
+            Given a game id, which loads from redis a json string that contains a persistent
+            state of a game, deserializes  it into a dictionary and reads all the properties
+            in order to load board state into current class instance so updating the games's
+            state can be done using the class' API abstraction.
+
+            :param game_id: game id
+            :return: None
+            -----------------------------------------------------------------------------
+        """
+        redis_data = self.__redis.get(game_id)
+        if redis_data is None:
+            return None
+
+        game_data = json.loads(redis_data)
+        if game_data is not None:
+            self.id = game_data['id']
+            self.timestamp = game_data['timestamp']
+            self.game_status = game_data['game_status']
+            self.mode = game_data['mode']
+            self.owner = game_data['owner']
+            self.moves_next = game_data['moves_next']
+            self.player_layout = game_data['player_layout']
+            self.players = game_data['players']
+            return 0
+        else:
+            return None
