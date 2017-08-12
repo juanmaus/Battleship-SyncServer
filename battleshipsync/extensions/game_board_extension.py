@@ -1,9 +1,9 @@
 from battleshipsync.helpers.board_helper import (
   board_has_space, hits_boat,
-  getRandomBoatSize,
-  getRandomInitialPosition,
-  getRandomDirection,
-  insertBoardInMatrix
+  get_random_boat_size,
+  get_random_initial_position,
+  get_random_direction,
+  insert_board_in_matrix
 )
 
 MAX_POPULATION_ATTEMPTS = 100
@@ -15,27 +15,27 @@ DIRECTIONS = [
 ]
 
 # Populates a board matrix that is assumed to be NxN with boats
-def populateBoard(boatsToCreate, boardMatrix):
+def populateBoard(boats_to_create, board_matrix):
   isPopulated = False
   boatsCreated = 0
   attemptsCount = 0
 
-  while(boatsCreated < boatsToCreate or attemptsCount > MAX_POPULATION_ATTEMPTS):
+  while(boatsCreated < boats_to_create or attemptsCount > MAX_POPULATION_ATTEMPTS):
     attemptsCount = attemptsCount + 1
 
-    boatSize = getRandomBoatSize()
-    initalPosition = getRandomInitialPosition(len(boardMatrix))
-    direction = getRandomDirection(
+    boat_size = get_random_boat_size()
+    initalPosition = get_random_initial_position(len(board_matrix))
+    direction = get_random_direction(
       DIRECTIONS,
       initalPosition,
-      boatSize,
-      boardMatrix
+      boat_size,
+      board_matrix
     )
 
     if not direction:
       continue
 
-    insertBoardInMatrix(direction, boatSize, initalPosition, boardMatrix)
+    insert_board_in_matrix(direction, boat_size, initalPosition, board_matrix)
     boatsCreated = boatsCreated + 1
 
-  return boardMatrix
+  return board_matrix
