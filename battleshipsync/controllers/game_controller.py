@@ -1,5 +1,6 @@
-from battleshipsync import app
-from flask import request, jsonify
+from http import HTTPStatus
+from battleshipsync import app, redis_store
+from flask import request, jsonify, json
 from battleshipsync.models.account import User
 from battleshipsync.models.account import UserService
 from battleshipsync.security.idam import find_user
@@ -22,17 +23,72 @@ def post_game():
     mode = game_data['mode']
     layout = game_data['player_layout']
     owner_id = current_identity.id
-    owner = None  # TODO use owner id to create a new player
+    owner = owner_id  # TODO create player entity from here
     game = Game(mode=mode, owner=owner, player_layout=layout)
-    # TODO perist game in redis and set other attributes
+    game.save()
+    #app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
+    return game.json()
+
 
 
 # --------------------------------------------------------------------------
 # GET GAME
 # --------------------------------------------------------------------------
-# Gets the account information associated with current session in the system
+# Gets the information of a current game (if it's valid or not)
 @app.route('/api/v1/game/<game_id>', methods=['GET'])
 @jwt_required()
 @enable_jsonp
 def get_game(game_id):
-    pass
+    game = Game(0,0,0)      #instace as null to later load from id
+    game.load(game_id)
+    if game.load(game_id) is None:
+        return (ErrorResponse('Game does not exists',
+                                     'Please enter a valid game id')).as_json(), HTTPStatus.BAD_REQUEST
+    else:
+        return game.json()
+
+# --------------------------------------------------------------------------
+# GET GAME LIST
+# --------------------------------------------------------------------------
+# Fetches a list of the current joinable games
+@app.route('/api/v1/game/', methods=['GET'])
+@jwt_required()
+@enable_jsonp
+def get_game_list():
+    keys= []
+    for key in redis_store.scan_iter(): #TODO: add filters players/type
+        # do something with the key
+        keys.append(str(key))
+    return jsonify(keys)
+
+
+# --------------------------------------------------------------------------
+# POST PLAYER
+# --------------------------------------------------------------------------
+# Adds a new player to a current joinable game
+
+
+@app.route('/api/v1/game/join', methods=['POST'])
+@jwt_required()
+@enable_jsonp
+def index():
+    game_data = request.get_json()
+    player = current_identity.id    #TODO: validate player can join
+    game_id = game_data['gameid']
+    board = game_data['board']      #TODO: start coding when board and player entity are done
+
+    game = Game(0, 0, 0)  # instace as null to later load from id
+    game.load(game_id)
+    if game.load(game_id) is None:
+        return (ErrorResponse('Game does not exists',
+                              'Please enter a valid game id')).as_json(), HTTPStatus.BAD_REQUEST
+    else:
+        game.join_player(player)
+        game.save()
+        return game.json()
+
+    #TODO: change game status once player quota is met
+
+
+
+
