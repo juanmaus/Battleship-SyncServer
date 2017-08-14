@@ -4,6 +4,7 @@ from flask import request, jsonify
 from battleshipsync import redis_store
 from battleshipsync.security.idam import find_user
 from battleshipsync.models.board import Board, ShootResult, parse_board_id
+from battleshipsync.models.dao.player_index import verify_ownership
 from battleshipsync.extensions.error_handling import ErrorResponse
 from battleshipsync.extensions.error_handling import SuccessResponse
 from flask_jwt import jwt_required, current_identity
@@ -25,7 +26,7 @@ def get_initial_board(board_id):
     if board_id is not None:
         # Check current identity matches owner of the board.
         identifiers = parse_board_id(board_id)
-        if current_identity.id is identifiers['player_id']:
+        if verify_ownership(player_id=identifiers['player_id'], user_id=current_identity.id):
             # If the user is the actual owner of the board, then we can provide the complete
             # and updated representation of the board.
             board = Board(
