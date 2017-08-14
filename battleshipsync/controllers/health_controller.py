@@ -1,5 +1,6 @@
-from battleshipsync import app
+from battleshipsync import app, redis_store
 from flask import jsonify
+from http import HTTPStatus
 
 
 # --------------------------------------------------------------------------
@@ -16,3 +17,25 @@ def get_api_root():
         "redis-status": "up and running",
         "mongo-status": "up and running"
     })
+
+
+@app.route('/api/v1/redis_status', methods=['GET'])
+def get_redis_status():
+    """
+        in order to check current REDIS status, we will submit some data and then 
+        we will try to retrieve it just to verify we can successfully create a 
+        connection with the REDIS Store.
+        :return: JSON object with result 
+    """
+    # First we save some data to a given key
+    redis_store.set("Battleship Version", "v1")
+    redis_store.set("Battleship Stack", "Python + Flask + REDIS + MongoDB")
+
+    # Now we retrieve the data
+
+    result = {
+        "Battleship Version": redis_store.get("Battleship Version"),
+        "Stack": redis_store.get("Battleship Stack"),
+        "Redis Status": "OK"
+    }
+    return jsonify(result), int(HTTPStatus.OK)

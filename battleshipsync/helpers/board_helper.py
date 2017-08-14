@@ -1,104 +1,197 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from random import randrange
 
 MIN_BOAT_SIZE = 2
 MAX_BOAT_SIZE = 5
 
-def board_has_space(direction, position, boat_size, boardSize):
-  if(direction == 'UP' or direction == 'LEFT'):
-    workingAxis = 'y' if direction == 'UP' else 'x'
 
-    return (position[workingAxis] + 1) - boat_size >= 0
+# ---------------------------------------------------------------------------------------
+#  FUNCTION POPULATE BOARD
+# ---------------------------------------------------------------------------------------
+def board_has_space(
+    direction,
+    position,
+    boat_size,
+    board_size,
+    ):
+    """
+    
+    :param direction: 
+    :param position: 
+    :param boat_size: 
+    :param board_size: 
+    :return: 
+    """
+    if direction == 'UP' or direction == 'LEFT':
+        working_axis = ('y' if direction == 'UP' else 'x')
 
-  elif(direction == 'RIGHT' or direction == 'DOWN'):
-    workingAxis = 'y' if direction == 'DOWN' else 'x'
+        return position[working_axis] + 1 - boat_size >= 0
+    elif direction == 'RIGHT' or direction == 'DOWN':
 
-    return  position[workingAxis] + boat_size <= boardSize
+        working_axis = ('y' if direction == 'DOWN' else 'x')
 
-def hits_boat(direction, position, boat_size, board_matrix):
-  if(direction == 'UP'):
-    firstSquare = position['y']
+        return position[working_axis] + boat_size <= board_size
 
-    for currentY in range(firstSquare + 1 - boat_size, firstSquare + 1):
-      if(board_matrix[currentY][position['x']] != 0):
-        isHittingBoat = True
-        break
 
-  elif(direction == 'DOWN'):
-    firstSquare = position['y']
+# ---------------------------------------------------------------------------------------
+#  FUNCTION POPULATE BOARD
+# ---------------------------------------------------------------------------------------
+def hits_boat(
+    direction,
+    position,
+    boat_size,
+    board_matrix,
+    ):
+    """
+    
+    :param direction: 
+    :param position: 
+    :param boat_size: 
+    :param board_matrix: 
+    :return: 
+    """
+    if direction == 'UP':
+        first_square = position['y']
 
-    for currentY in range(firstSquare, firstSquare + boat_size):
-      if(board_matrix[currentY][position['x']] != 0):
-        isHittingBoat = True
-        break
+        for currentY in range(first_square + 1 - boat_size, first_square
+                              + 1):
+            if board_matrix[currentY][position['x']] != 0:
+                is_hitting_boat = True
+                break
+    elif direction == 'DOWN':
 
-  elif(direction == 'RIGHT'):
-    firstSquare = position['x']
+        first_square = position['y']
 
-    for currentX in range(firstSquare, firstSquare + boat_size):
-      if(board_matrix[position['y']][currentX] != 0):
-        isHittingBoat = True
-        break
+        for currentY in range(first_square, first_square + boat_size):
+            if board_matrix[currentY][position['x']] != 0:
+                is_hitting_boat = True
+                break
+    elif direction == 'RIGHT':
 
-  elif(direction == 'LEFT'):
-    firstSquare = position['x']
+        first_square = position['x']
 
-    for currentX in range(firstSquare + 1 - boat_size, firstSquare + 1):
-      if(board_matrix[position['y']][currentX] != 0):
-        isHittingBoat = True
-        break
+        for currentX in range(first_square, first_square + boat_size):
+            if board_matrix[position['y']][currentX] != 0:
+                is_hitting_boat = True
+                break
+    elif direction == 'LEFT':
 
-def insert_board_in_matrix(direction, boat_size, initialPosition, board_matrix):
-  if(direction == 'UP'):
-    firstSquare = initialPosition['y']
+        first_square = position['x']
 
-    for currentY in range(firstSquare + 1 - boat_size, firstSquare + 1):
-      board_matrix[currentY][initialPosition['x']] = boat_size
+        for currentX in range(first_square + 1 - boat_size, first_square
+                              + 1):
+            if board_matrix[position['y']][currentX] != 0:
+                is_hitting_boat = True
+                break
 
-  elif(direction == 'DOWN'):
-    firstSquare = initialPosition['y']
 
-    for currentY in range(firstSquare, firstSquare + boat_size):
-      board_matrix[currentY][initialPosition['x']] = boat_size
+# ---------------------------------------------------------------------------------------
+#  FUNCTION POPULATE BOARD
+# ---------------------------------------------------------------------------------------
+def insert_board_in_matrix(
+    direction,
+    boat_size,
+    initial_position,
+    board_matrix,
+    ):
 
-  elif(direction == 'RIGHT'):
-    firstSquare = initialPosition['x']
+    """
+    
+    :param direction: 
+    :param boat_size: 
+    :param initial_position: 
+    :param board_matrix: 
+    :return: 
+    """
 
-    for currentX in range(firstSquare, firstSquare + boat_size):
-      board_matrix[initialPosition['y']][currentX] = boat_size
+    if direction == 'UP':
+        first_square = initial_position['y']
 
-  elif(direction == 'LEFT'):
-    firstSquare = initialPosition['x']
+        for currentY in range(first_square + 1 - boat_size, first_square
+                              + 1):
+            board_matrix[currentY][initial_position['x']] = boat_size
+    elif direction == 'DOWN':
 
-    for currentX in range(firstSquare + 1 - boat_size, firstSquare + 1):
-      board_matrix[initialPosition['y']][currentX] = boat_size
+        first_square = initial_position['y']
 
-  return board_matrix
+        for currentY in range(first_square, first_square + boat_size):
+            board_matrix[currentY][initial_position['x']] = boat_size
+    elif direction == 'RIGHT':
 
+        first_square = initial_position['x']
+
+        for currentX in range(first_square, first_square + boat_size):
+            board_matrix[initial_position['y']][currentX] = boat_size
+    elif direction == 'LEFT':
+
+        first_square = initial_position['x']
+
+        for currentX in range(first_square + 1 - boat_size, first_square
+                              + 1):
+            board_matrix[initial_position['y']][currentX] = boat_size
+
+    return board_matrix
+
+
+# ---------------------------------------------------------------------------------------
+#  FUNCTION POPULATE BOARD
+# ---------------------------------------------------------------------------------------
 def get_random_boat_size():
-  return randrange(MIN_BOAT_SIZE, MAX_BOAT_SIZE)
+    return randrange(MIN_BOAT_SIZE, MAX_BOAT_SIZE)
 
-def get_random_initial_position(matrixSize):
-  return { 'x': randrange(0, matrixSize), 'y': randrange(0, matrixSize) }
+
+# ---------------------------------------------------------------------------------------
+#  FUNCTION POPULATE BOARD
+# ---------------------------------------------------------------------------------------
+def get_random_initial_position(matrix_size):
+    """
+    
+    :param matrix_size: 
+    :return: 
+    """
+    return {'x': randrange(0, matrix_size), 'y': randrange(0,
+                                                           matrix_size)}
+
 
 # Gets de direction for the boat checking that there is space for the boat
-def get_random_direction(directions, position, boat_size, board_matrix):
-  if not directions:
-    return None
 
-  boardSize = len(board_matrix)
-  index = randrange(0, len(directions))
-  direction = directions[index]
-  hasSpace = True
-  isHittingBoat = False
+# ---------------------------------------------------------------------------------------
+#  FUNCTION POPULATE BOARD
+# ---------------------------------------------------------------------------------------
+def get_random_direction(
+    directions,
+    position,
+    boat_size,
+    board_matrix,
+    ):
 
-  if not board_has_space(direction, position, boat_size, boardSize):
-    del directions[index]
+    """
+    
+    :param directions: 
+    :param position: 
+    :param boat_size: 
+    :param board_matrix: 
+    :return: 
+    """
+    if not directions:
+        return None
 
-    return get_random_direction(directions, position, boat_size, board_matrix)
+    board_size = len(board_matrix)
+    index = randrange(0, len(directions))
+    direction = directions[index]
+    hasSpace = True
+    isHittingBoat = False
 
-  if hits_boat(direction, position, boat_size, board_matrix):
-    del directions[index]
+    if not board_has_space(direction, position, boat_size, board_size):
+        del directions[index]
 
-    return get_random_direction(directions, position, boat_size, board_matrix)
+        return get_random_direction(directions, position, boat_size,
+                                    board_matrix)
 
-  return direction
+    if hits_boat(direction, position, boat_size, board_matrix):
+        del directions[index]
+
+        return get_random_direction(directions, position, boat_size,
+                                    board_matrix)
+    return direction
