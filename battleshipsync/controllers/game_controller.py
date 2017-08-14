@@ -8,6 +8,7 @@ from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
 from battleshipsync.extensions.error_handling import SuccessResponse
 from battleshipsync.models.game import Game, GameStatus, GameMode
+from battleshipsync.models.player import Player,PlayerType
 from flask_jwt import jwt_required, current_identity
 import uuid
 
@@ -56,8 +57,8 @@ def get_game(game_id):
 @enable_jsonp
 def get_game_list():
     keys= []
-    for key in redis_store.scan_iter(): #TODO: add filters players/type
-        # do something with the key
+    #for key in redis_store.scan_iter("F-*"): #check with team first
+    for key in redis_store.scan_iter(""):  # TODO: add filters players/type
         keys.append(str(key))
     return jsonify(keys)
 
@@ -66,26 +67,26 @@ def get_game_list():
 # POST PLAYER
 # --------------------------------------------------------------------------
 # Adds a new player to a current joinable game
-
-
-@app.route('/api/v1/game/join', methods=['POST'])
+@app.route('/api/v1/game/<game_id>/player', methods=['POST'])
 @jwt_required()
 @enable_jsonp
-def index():
+def join_game(game_id):
     game_data = request.get_json()
-    player = current_identity.id    #TODO: validate player can join
-    game_id = game_data['gameid']
-    board = game_data['board']      #TODO: start coding when board and player entity are done
-
+    player_type = game_data['player_type']
     game = Game(0, 0, 0)  # instace as null to later load from id
     game.load(game_id)
     if game.load(game_id) is None:
-        return (ErrorResponse('Game does not exists',
-                              'Please enter a valid game id')).as_json(), HTTPStatus.BAD_REQUEST
+        return (ErrorResponse('Unable to join game',
+                              'Please make sure this game is joinable')).as_json(), HTTPStatus.BAD_REQUEST
     else:
-        game.join_player(player)
-        game.save()
-        return game.json()
+        player = Player(current_identity.id, game_id=game_id, player_type=player_type)
+        if game.join_player(player):
+            game.join_player(player)
+            game.save()
+            return game.json()
+        else:
+            return(ErrorResponse('Player already in game',
+                                'This Player is already in this game')).as_json(), HTTPStatus.BAD_REQUEST
 
     #TODO: change game status once player quota is met
 

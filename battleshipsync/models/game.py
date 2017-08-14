@@ -1,5 +1,6 @@
 from enum import Enum
 from flask import json
+from battleshipsync.models.player import Player
 import datetime
 import uuid
 
@@ -106,13 +107,17 @@ class Game:
     # METHOD JOIN PLAYER
     # -----------------------------------------------------------------------------------
     def join_player(self, player):
-        # 1) Validate player is not already present in the game and that is type matches
-        # one of the available types in the player_layout attribute.
+        player_data = player.static_metadata()
+        player_id = player_data["player_id"]
+        if player_id in self.players:
+            return False
+        ##if player.
+        # 1) Link userId to Player id, make player id persistant to userId
         # 2) Create a board for the new player using the current game's spec and initialize
         # stats
         # 3) Add the board id to player and add the player to the player's list.
         # TODO!!!
-        self.players.append(player)
+        self.players.append(player_id)
         return True
 
 
