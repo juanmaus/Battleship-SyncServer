@@ -7,7 +7,7 @@ Endpoint: /api/v1/game
 ### GET: /api/v1/game/<game_id>
 
 This must be an authenticated request. This operations fetches for the JSON representation of
-a game entity. If the provided *game_id* does exist in the system as a valid/registered
+a game entity. If the provided *game_id* does not exist in the system as a valid/registered
 game, then the following structure is returned:
 
 ```json
@@ -23,7 +23,7 @@ game, then the following structure is returned:
 ### GET: /api/v1/game/
 
 This must be an authenticated request. This operations fetches for the JSON representation of
-all games:
+all availible games:
 
 ```json
 
@@ -33,6 +33,31 @@ all games:
   "b'bdee017e-4c43-45b5-b873-c2c9f4156091'",
   "b'49151df3-4786-41da-a001-9c464444f38e'"
 ]
+
+```
+
+### POST: /api/v1/game/<game_id>/player
+
+This must be an authenticated request. This operations joins a player to a current game using the
+following json to join:
+
+```json
+
+{
+            "player_type": "HUMAN",
+            "board":[
+                 [0,0,0,5,5,5,5,5,0,0],
+                 [2,2,0,0,0,0,0,0,0,0],
+                 [0,0,1,0,0,0,4,0,0,0],
+                 [0,0,0,0,0,0,4,0,0,0],
+                 [0,0,0,0,0,0,4,0,0,0],
+                 [0,0,0,0,0,0,4,0,0,0],
+                 [0,0,2,0,1,0,0,0,0,0],
+                 [0,0,2,0,0,0,0,0,3,0],
+                 [0,0,0,0,0,0,0,0,3,0],
+                 [3,3,3,0,0,0,0,0,3,0]
+             ]
+}
 
 ```
 
