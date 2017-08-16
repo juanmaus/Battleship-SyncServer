@@ -8,7 +8,6 @@ import uuid
 # ---------------------------------------------------------------------------------------
 # ENUMERATION GAME STATUS
 # ---------------------------------------------------------------------------------------
-from battleshipsync import redis_store
 
 
 class GameStatus(Enum):
@@ -60,12 +59,12 @@ class Game:
     # -----------------------------------------------------------------------------------
 
     __game_id = ""
-    __redis = redis_store
+    __persistence_provider = None
 
     # -----------------------------------------------------------------------------------
     # CLASS CONSTRUCTOR
     # -----------------------------------------------------------------------------------
-    def __init__(self, mode, owner, player_layout):
+    def __init__(self, mode, owner, player_layout, redis):
         """
             :param mode: GameMode type. Can be 4PLAYER mode or 2PLAYER mode
             :param owner: The id of the user that created the game.
@@ -79,6 +78,7 @@ class Game:
         self.moves_next = owner
         self.player_layout = player_layout
         self.players = []
+        self.__persistence_provider = redis
 
     # -----------------------------------------------------------------------------------
     # METHOD SAVE
@@ -91,7 +91,7 @@ class Game:
             :return: Nothing
         """
 
-        self.__redis.set(self.id, self.json())
+        self.__persistence_provider.set(self.id, self.json())
 
     # -----------------------------------------------------------------------------------
     # METHOD JSON
@@ -159,7 +159,7 @@ class Game:
             :return: None
             -----------------------------------------------------------------------------
         """
-        redis_data = self.__redis.get(game_id)
+        redis_data = self.__persistence_provider.get(game_id)
         if redis_data is None:
             return None
 

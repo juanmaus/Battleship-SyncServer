@@ -4,6 +4,7 @@ from flask import request, jsonify, json
 from battleshipsync.models.account import User
 from battleshipsync.models.account import UserService
 from battleshipsync.security.idam import find_user
+from battleshipsync import redis_store
 from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
 from battleshipsync.extensions.error_handling import SuccessResponse
@@ -25,7 +26,7 @@ def post_game():
     layout = game_data['player_layout']
     owner_id = current_identity.id
     owner = owner_id  # TODO create player entity from here
-    game = Game(mode=mode, owner=owner, player_layout=layout)
+    game = Game(mode=mode, owner=owner, player_layout=layout, persistence_provider=redis_store)
     game.save()
     #app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
     return game.json()
@@ -40,7 +41,7 @@ def post_game():
 @jwt_required()
 @enable_jsonp
 def get_game(game_id):
-    game = Game(0,0,0)      #instace as null to later load from id
+    game = Game(0, 0, 0, persistence_provider=redis_store)#instace as null to later load from id
     game.load(game_id)
     if game.load(game_id) is None:
         return (ErrorResponse('Game does not exists',
@@ -58,7 +59,8 @@ def get_game(game_id):
 def get_game_list():
     keys= []
     #for key in redis_store.scan_iter("F-*"): #check with team first
-    for key in redis_store.scan_iter(""):  # TODO: add filters players/type
+    for key in redis_store.scan_iter():  # TODO: add filters players/type
+        print(key)
         keys.append(str(key))
     return jsonify(keys)
 
@@ -66,29 +68,7 @@ def get_game_list():
 # --------------------------------------------------------------------------
 # POST PLAYER
 # --------------------------------------------------------------------------
-# Adds a new player to a current joinable game
-@app.route('/api/v1/game/<game_id>/player', methods=['POST'])
-@jwt_required()
-@enable_jsonp
-def join_game(game_id):
-    game_data = request.get_json()
-    player_type = game_data['player_type']
-    game = Game(0, 0, 0)  # instace as null to later load from id
-    game.load(game_id)
-    if game.load(game_id) is None:
-        return (ErrorResponse('Unable to join game',
-                              'Please make sure this game is joinable')).as_json(), HTTPStatus.BAD_REQUEST
-    else:
-        player = Player(current_identity.id, game_id=game_id, player_type=player_type)
-        if game.join_player(player):
-            game.join_player(player)
-            game.save()
-            return game.json()
-        else:
-            return(ErrorResponse('Player already in game',
-                                'This Player is already in this game')).as_json(), HTTPStatus.BAD_REQUEST
-
-    #TODO: change game status once player quota is met
+# Moved to player_entity -- will remove comment after merge
 
 
 
