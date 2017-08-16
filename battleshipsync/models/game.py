@@ -1,6 +1,6 @@
 from enum import Enum
 from flask import json
-from battleshipsync.models.player import Player
+from battleshipsync.models.dao.game_index import register_game
 import datetime
 import uuid
 
@@ -60,11 +60,12 @@ class Game:
 
     __game_id = ""
     __persistence_provider = None
+    __open_spots = []
 
     # -----------------------------------------------------------------------------------
     # CLASS CONSTRUCTOR
     # -----------------------------------------------------------------------------------
-    def __init__(self, mode, owner, player_layout, redis):
+    def __init__(self, mode, owner, player_layout, persistence_provider):
         """
             :param mode: GameMode type. Can be 4PLAYER mode or 2PLAYER mode
             :param owner: The id of the user that created the game.
@@ -78,7 +79,7 @@ class Game:
         self.moves_next = owner
         self.player_layout = player_layout
         self.players = []
-        self.__persistence_provider = redis
+        self.__persistence_provider = persistence_provider
 
     # -----------------------------------------------------------------------------------
     # METHOD SAVE
@@ -90,15 +91,17 @@ class Game:
             to create a game as well as an update method.
             :return: Nothing
         """
-
-        self.__persistence_provider.set(self.id, self.json())
+        if self.__persistence_provider is not None:
+            self.__persistence_provider.set(self.id, self.json())
+            return True
+        return False
 
     # -----------------------------------------------------------------------------------
     # METHOD JSON
     # -----------------------------------------------------------------------------------
     def json(self):
         """
-            This method get the game state as a json string
+            This method gets the game state as a json string
             :return: json string representation of the current game status
         """
         return json.dumps(self.export_state(), sort_keys=False, indent=2)
@@ -119,6 +122,19 @@ class Game:
         # TODO!!!
         self.players.append(player_id)
         return True
+
+    # -----------------------------------------------------------------------------------
+    # METHOD REGISTER
+    # -----------------------------------------------------------------------------------
+    def register(self):
+        """
+            Registers a new game on a game index for filtering purposes
+            :return: True if the player was registered successfully
+        """
+        if self.save():
+            return register_game(self.static_metadata())
+        return False
+
 
 
     # -----------------------------------------------------------------------------------
@@ -143,6 +159,20 @@ class Game:
         }
         return state
 
+    # -----------------------------------------------------------------------------------
+    # METHOD STATIC METADATA
+    # -----------------------------------------------------------------------------------
+    def static_metadata(self):
+        """
+            Returns a dictionary with the current game's state so it can be serialized
+            and persisted.
+            :return: dictionary with current instance of game state
+        """
+        return {
+            "game_id": self.id,
+            "open_spots": self.__open_spots,
+            "players": self.player_layout
+        }
     # -----------------------------------------------------------------------------------
     # LOAD METHOD
     # -----------------------------------------------------------------------------------

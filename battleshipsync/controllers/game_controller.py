@@ -9,7 +9,7 @@ from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
 from battleshipsync.extensions.error_handling import SuccessResponse
 from battleshipsync.models.game import Game, GameStatus, GameMode
-from battleshipsync.models.player import Player,PlayerType
+from battleshipsync.models.player import Player
 from flask_jwt import jwt_required, current_identity
 import uuid
 
@@ -26,12 +26,19 @@ def post_game():
     layout = game_data['player_layout']
     owner_id = current_identity.id
     owner = owner_id  # TODO create player entity from here
-    game = Game(mode=mode, owner=owner, player_layout=layout, persistence_provider=redis_store)
-    game.save()
-    #app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
-    return game.json()
-
-
+    if game_data is not None and layout is not None:
+        game = Game(mode=mode, owner=owner, player_layout=layout, persistence_provider=redis_store)
+        if game.register():
+            # app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
+            return jsonify(game.export_state()), int(HTTPStatus.CREATED)
+        else:
+            return jsonify({
+                "Error": "Unable to register game"
+            }), HTTPStatus.INTERNAL_SERVER_ERROR
+    else:
+        return jsonify({
+            "Error": "Invalid game data"
+        }), HTTPStatus.BAD_REQUEST
 
 # --------------------------------------------------------------------------
 # GET GAME
