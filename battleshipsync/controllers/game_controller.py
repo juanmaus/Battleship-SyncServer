@@ -4,10 +4,12 @@ from flask import request, jsonify, json
 from battleshipsync.models.account import User
 from battleshipsync.models.account import UserService
 from battleshipsync.security.idam import find_user
+from battleshipsync import redis_store
 from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
 from battleshipsync.extensions.error_handling import SuccessResponse
 from battleshipsync.models.game import Game, GameStatus, GameMode
+from battleshipsync.models.player import Player
 from flask_jwt import jwt_required, current_identity
 import uuid
 
@@ -24,12 +26,19 @@ def post_game():
     layout = game_data['player_layout']
     owner_id = current_identity.id
     owner = owner_id  # TODO create player entity from here
-    game = Game(mode=mode, owner=owner, player_layout=layout)
-    game.save()
-    #app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
-    return game.json()
-
-
+    if game_data is not None and layout is not None:
+        game = Game(mode=mode, owner=owner, player_layout=layout, persistence_provider=redis_store)
+        if game.register():
+            # app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
+            return jsonify(game.export_state()), int(HTTPStatus.CREATED)
+        else:
+            return jsonify({
+                "Error": "Unable to register game"
+            }), HTTPStatus.INTERNAL_SERVER_ERROR
+    else:
+        return jsonify({
+            "Error": "Invalid game data"
+        }), HTTPStatus.BAD_REQUEST
 
 # --------------------------------------------------------------------------
 # GET GAME
@@ -39,7 +48,7 @@ def post_game():
 @jwt_required()
 @enable_jsonp
 def get_game(game_id):
-    game = Game(0,0,0)      #instace as null to later load from id
+    game = Game(0, 0, 0, persistence_provider=redis_store)#instace as null to later load from id
     game.load(game_id)
     if game.load(game_id) is None:
         return (ErrorResponse('Game does not exists',
@@ -56,8 +65,9 @@ def get_game(game_id):
 @enable_jsonp
 def get_game_list():
     keys= []
-    for key in redis_store.scan_iter(): #TODO: add filters players/type
-        # do something with the key
+    #for key in redis_store.scan_iter("F-*"): #check with team first
+    for key in redis_store.scan_iter():  # TODO: add filters players/type
+        print(key)
         keys.append(str(key))
     return jsonify(keys)
 
@@ -65,29 +75,7 @@ def get_game_list():
 # --------------------------------------------------------------------------
 # POST PLAYER
 # --------------------------------------------------------------------------
-# Adds a new player to a current joinable game
-
-
-@app.route('/api/v1/game/join', methods=['POST'])
-@jwt_required()
-@enable_jsonp
-def index():
-    game_data = request.get_json()
-    player = current_identity.id    #TODO: validate player can join
-    game_id = game_data['gameid']
-    board = game_data['board']      #TODO: start coding when board and player entity are done
-
-    game = Game(0, 0, 0)  # instace as null to later load from id
-    game.load(game_id)
-    if game.load(game_id) is None:
-        return (ErrorResponse('Game does not exists',
-                              'Please enter a valid game id')).as_json(), HTTPStatus.BAD_REQUEST
-    else:
-        game.join_player(player)
-        game.save()
-        return game.json()
-
-    #TODO: change game status once player quota is met
+# Moved to player_entity -- will remove comment after merge
 
 
 
