@@ -25,25 +25,42 @@ def register_game(game):
     return True
 
 
-# ---------------------------------------------------------------------------------------
-# CLASS PLAYER
-# ---------------------------------------------------------------------------------------
-def verify_ownership(player_id, user_id):
+def add_player(game_id,player_type):
     """
-        Checks on the players index if a given player id is owned by the given user id. 
-        :param player_id: The id of the player
-        :param user_id:  The user who supposedly owns the given player id
-        :return: 
+        Adds a player to the game in the game dictionary
+        Also, has the logic to change the game status when game is filled
+
+        :param game: gameId
+        :param player: a playerId
+        :return: True game was successfully registered
     """
-    players_data = redis.get('players')
-    players = []
-    # If there are no players, then we create an empty list
-    if players_data is not None:
-        players = json.loads(players_data)
-    try:
-        for player in players:
-            if player['player_id'] is player_id and player['user_id'] is user_id:
-                return True
-        return False
-    except:
-        return False
+    games_data = redis.get('games')
+    games = []
+    newgames= []
+    # If there are no games, then we create an empty list
+    if games_data is not None:
+        games = json.loads(games_data)
+        key= None
+        try:
+            for game in games:
+                if game_id == game["game_id"]:
+                    key = __get_key_in_list(game["open_spots"], player_type)
+                    if key is not None:
+                        del game["open_spots"][key]
+                    else:
+                        return False
+                    newgames.append(game)
+                else:
+                    newgames.append(game)
+        except:
+            return False
+    games.append(game)
+    redis.set('games', json.dumps(games))
+    games = None
+    return json.dumps(newgames, indent=4, sort_keys=True)
+
+def __get_key_in_list(spots,match):     #Maybe needs to be redefined somewhere else, dunno
+    for index, spot in enumerate(spots):
+        print("huehuehe"+spot)
+        if spot == match:
+            return index
