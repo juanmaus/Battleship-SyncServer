@@ -74,7 +74,7 @@ def get_game_list():
             for game in games:
                 if game["game_status"] is GameStatus.WAITING_FOR_PLAYERS.value:
                     keys.append(game["game_id"])
-            return games_data
+            return jsonify(keys)
         except:
             return False
 
