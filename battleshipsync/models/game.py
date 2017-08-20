@@ -79,6 +79,7 @@ class Game:
         self.moves_next = owner
         self.player_layout = player_layout
         self.players = []
+        self.__open_spots = player_layout
         self.__persistence_provider = persistence_provider
 
     # -----------------------------------------------------------------------------------
@@ -171,7 +172,7 @@ class Game:
         return {
             "game_id": self.id,
             "open_spots": self.__open_spots,
-            "players": self.player_layout
+            "game_status": self.game_status.value
         }
     # -----------------------------------------------------------------------------------
     # LOAD METHOD

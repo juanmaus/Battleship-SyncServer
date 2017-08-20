@@ -8,6 +8,7 @@ from battleshipsync import redis_store
 from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
 from battleshipsync.extensions.error_handling import SuccessResponse
+from battleshipsync.models.dao.game_index import add_player
 from battleshipsync.models.game import Game, GameStatus, GameMode
 from battleshipsync.models.player import Player
 from flask_jwt import jwt_required, current_identity
@@ -65,11 +66,17 @@ def get_game(game_id):
 @enable_jsonp
 def get_game_list():
     keys= []
-    #for key in redis_store.scan_iter("F-*"): #check with team first
-    for key in redis_store.scan_iter():  # TODO: add filters players/type
-        print(key)
-        keys.append(str(key))
-    return jsonify(keys)
+    games_data = redis_store.get('games')
+    # If there are no players, then we create an empty list
+    if games_data is not None:
+        games = json.loads(games_data)
+        try:
+            for game in games:
+                if game["game_status"] is GameStatus.WAITING_FOR_PLAYERS.value:
+                    keys.append(game["game_id"])
+            return jsonify(keys)
+        except:
+            return False
 
 
 # --------------------------------------------------------------------------
