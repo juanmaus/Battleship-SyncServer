@@ -1,4 +1,5 @@
 from battleshipsync import redis_store as redis
+from battleshipsync.models.player import Player
 import json
 
 
@@ -27,7 +28,7 @@ def register_player(player):
 
 
 # ---------------------------------------------------------------------------------------
-# CLASS PLAYER
+# FUNCTION VERIFY OWNERSHIP
 # ---------------------------------------------------------------------------------------
 def verify_ownership(player_id, user_id):
     """
@@ -48,3 +49,15 @@ def verify_ownership(player_id, user_id):
         return False
     except:
         return False
+
+
+# ---------------------------------------------------------------------------------------
+# FUNCTION CLASS PLAYER
+# ---------------------------------------------------------------------------------------
+def get_player(player_id):
+    player_data = redis.get(player_id)
+    if player_data is not None:
+        player = Player(None, None, redis)
+        player.load()
+        return player
+    return None
