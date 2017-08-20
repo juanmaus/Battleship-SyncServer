@@ -8,6 +8,7 @@ import uuid
 # CLASS PLAYER
 # ---------------------------------------------------------------------------------------
 class Player:
+
     """
          A player establishes a relationship between a user of the game and an specific
          instance of Game. The player model has the responsibility of keeping player's
@@ -66,11 +67,12 @@ class Player:
         """
         self.__nick_name = nickname
         carrier = int(ShootResult.CARRIER.value)
-        cruise = int(ShootResult.CRUISE.value)
-        destroyer = int(ShootResult.DESTROYER.value)
-        submarine = int(ShootResult.SUBMARINE.value)
         battleship = int(ShootResult.BATTLESHIP.value)
-        self.__current_fleet_value = carrier + destroyer + cruise + submarine + battleship
+        cruise = int(ShootResult.CRUISE.value)
+        submarine = int(ShootResult.SUBMARINE.value)
+        destroyer = int(ShootResult.DESTROYER.value)
+
+        self.__current_fleet_value = carrier + destroyer + (cruise * 2) + submarine + battleship
         self.__points_gained = 0
         self.__alive = True
         self.__is_human = is_human
@@ -148,6 +150,16 @@ class Player:
             self.__is_human = player['is_human']
             return True
         return False
+
+    # -----------------------------------------------------------------------------------
+    # METHOD GET OWNER
+    # -----------------------------------------------------------------------------------
+    def get_owner(self):
+        """
+            Gets the owner of the player. 
+            :return: 
+        """
+        return self.__user_id
 
     # -----------------------------------------------------------------------------------
     # METHOD SAVE
