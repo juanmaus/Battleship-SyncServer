@@ -1,8 +1,8 @@
 from enum import Enum
 from flask import json
-from battleshipsync.models.dao.game_index import register_game
 import datetime
 import uuid
+
 
 
 # ---------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ class Game:
             This method gets the game state as a json string
             :return: json string representation of the current game status
         """
-        return json.dumps(self.export_state(), sort_keys=False, indent=2)
+        return json.dumps(self.export_state())
 
     # -----------------------------------------------------------------------------------
     # METHOD JOIN PLAYER
@@ -117,12 +117,14 @@ class Game:
         # 3) Add the board id to player and add the player to the player's list.
         # TODO!!!
         self.players.append(player_id)
+        self.save()
         return True
 
     # -----------------------------------------------------------------------------------
     # METHOD REGISTER
     # -----------------------------------------------------------------------------------
     def register(self):
+        from battleshipsync.models.dao.game_index import register_game
         """
             Registers a new game on a game index for filtering purposes
             :return: True if the player was registered successfully

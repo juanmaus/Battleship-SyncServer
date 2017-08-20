@@ -1,7 +1,7 @@
 from http import HTTPStatus
-from battleshipsync import app, redis_store
+from battleshipsync import app
 from flask import request, jsonify, json
-from battleshipsync import redis_store
+from battleshipsync import redis_store as persistance_provider
 from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
 from battleshipsync.models.dao.game_index import add_player
@@ -20,7 +20,7 @@ def post_game():
     mode = game_data['mode']
     layout = game_data['player_layout']
     if game_data is not None and layout is not None:
-        game = Game(mode=mode, player_layout=layout, persistence_provider=redis_store)
+        game = Game(mode=mode, player_layout=layout, persistence_provider=persistance_provider)
         if game.register():
             # app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
             return jsonify(game.export_state()), int(HTTPStatus.CREATED)
@@ -41,7 +41,7 @@ def post_game():
 @jwt_required()
 @enable_jsonp
 def get_game(game_id):
-    game = Game(None, None, persistence_provider=redis_store)#instace as null to later load from id
+    game = Game(None, None, persistence_provider=persistance_provider)#instace as null to later load from id
     game.load(game_id)
     if game.load(game_id) is None:
         return (ErrorResponse('Game does not exists',
@@ -58,7 +58,7 @@ def get_game(game_id):
 @enable_jsonp
 def get_game_list():
     keys= []
-    games_data = redis_store.get('games')
+    games_data = persistance_provider.get('games')
     # If there are no players, then we create an empty list
     if games_data is not None:
         games = json.loads(games_data)
@@ -66,18 +66,14 @@ def get_game_list():
             for game in games:
                 if game["game_status"] is GameStatus.WAITING_FOR_PLAYERS.value:
                     keys.append(game["game_id"])
-                    if add_player(game["game_id"], "HUMAN"):
-                        print("test")
             return jsonify(keys)
         except:
-            return False
-
-
-# --------------------------------------------------------------------------
-# POST PLAYER
-# --------------------------------------------------------------------------
-# Moved to player_entity -- will remove comment after merge
-
+            return jsonify({
+                "Error": "Unable to fetch games"
+            }), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({
+        "Error": "No games found, create a new one?"
+    }), HTTPStatus.NOT_FOUND
 
 
 

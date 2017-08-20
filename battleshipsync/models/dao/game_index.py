@@ -1,4 +1,5 @@
 from battleshipsync import redis_store as persistence_provider
+from battleshipsync.models.game import Game
 import json
 
 
@@ -20,23 +21,28 @@ def register_game(game):
     if games_data is not None:
         games = json.loads(games_data)
     games.append(game)
-    persistence_provider.set('games', json.dumps(games))
+    persistence_provider.set('games', json.dumps(games, sort_keys=False, indent=2))
     games = None
     return True
 
 
-def add_player(game_id, player_type):
+def add_player(game_id, player_id, player_type):
     """
         Adds a player to the game in the game dictionary
         Also, has the logic to change the game status when game is filled
 
         :param game_id: gameId
         :param player_type: a player_type
+        :param player_id: a player_id
         :return: True game was successfully added
     """
-    # game = Game(None, None, persistence_provider=persistence_provider)  # instance as null to later load from id
-    # game.load(game_id)
-    update_open_spots(game_id=game_id, player_type=player_type)
+    game = Game(None, None, persistence_provider=persistence_provider)  # instance as null to later load from id
+    game.load(game_id)
+    if game.join_player(player_id=player_id):
+        update_open_spots(game_id=game_id, player_type=player_type)
+        return True
+    else:
+        return False
 
 
 def update_open_spots(game_id, player_type):
@@ -60,16 +66,16 @@ def update_open_spots(game_id, player_type):
                     key = get_key_in_list(game["open_spots"], player_type)
                     if key is not None:
                         del game["open_spots"][key]
+                        newgames.append(game)
                     else:
                         return False
-                    newgames.append(game)
                 else:
                     newgames.append(game)
         except:
             return False
-    games.append(game)
-    persistence_provider.set('games', json.dumps(games))
+    persistence_provider.set('games', json.dumps(newgames))
     games = None
+    newgames = None
     return True
 
 
