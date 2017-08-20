@@ -1,18 +1,12 @@
 from http import HTTPStatus
 from battleshipsync import app, redis_store
 from flask import request, jsonify, json
-from battleshipsync.models.account import User
-from battleshipsync.models.account import UserService
-from battleshipsync.security.idam import find_user
 from battleshipsync import redis_store
 from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
-from battleshipsync.extensions.error_handling import SuccessResponse
 from battleshipsync.models.dao.game_index import add_player
 from battleshipsync.models.game import Game, GameStatus, GameMode
-from battleshipsync.models.player import Player
 from flask_jwt import jwt_required, current_identity
-import uuid
 
 
 # --------------------------------------------------------------------------
@@ -25,10 +19,8 @@ def post_game():
     game_data = request.get_json()
     mode = game_data['mode']
     layout = game_data['player_layout']
-    owner_id = current_identity.id
-    owner = owner_id  # TODO create player entity from here
     if game_data is not None and layout is not None:
-        game = Game(mode=mode, owner=owner, player_layout=layout, persistence_provider=redis_store)
+        game = Game(mode=mode, player_layout=layout, persistence_provider=redis_store)
         if game.register():
             # app.logger.info('Game with ID: \'' + game.id + '\' was created by user ' + str(current_identity.username )+' mode: ' + str(mode))
             return jsonify(game.export_state()), int(HTTPStatus.CREATED)
@@ -49,7 +41,7 @@ def post_game():
 @jwt_required()
 @enable_jsonp
 def get_game(game_id):
-    game = Game(0, 0, 0, persistence_provider=redis_store)#instace as null to later load from id
+    game = Game(None, None, persistence_provider=redis_store)#instace as null to later load from id
     game.load(game_id)
     if game.load(game_id) is None:
         return (ErrorResponse('Game does not exists',
@@ -74,6 +66,8 @@ def get_game_list():
             for game in games:
                 if game["game_status"] is GameStatus.WAITING_FOR_PLAYERS.value:
                     keys.append(game["game_id"])
+                    if add_player(game["game_id"], "HUMAN"):
+                        print("test")
             return jsonify(keys)
         except:
             return False
