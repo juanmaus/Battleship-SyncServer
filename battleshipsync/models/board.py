@@ -1,4 +1,5 @@
 from enum import Enum
+from battleshipsync.models.player import Player
 import json
 
 
@@ -85,12 +86,12 @@ class Board:
     __game_id = ""
     __player_id = ""
     __board_id = ""
-    __redis = None
+    __persistence_provider = None
     
     # -----------------------------------------------------------------------------------
     # CONSTRUCTOR METHOD 
     # -----------------------------------------------------------------------------------
-    def __init__(self, player_id, game_id, redis_store):
+    def __init__(self, player_id, game_id, persistence_provider):
         """
             -----------------------------------------------------------------------------
             Creates instances of Board class
@@ -101,7 +102,7 @@ class Board:
         self.__player_id = player_id
         self.__game_id = game_id
         self.__board_id = self.__build_id()
-        self.__redis = redis_store
+        self.__persistence_provider = persistence_provider
 
     # -----------------------------------------------------------------------------------
     # METHOD SAVE
@@ -115,7 +116,7 @@ class Board:
             :return: Nothing
         """
 
-        self.__redis.set(self.__board_id, self.json())
+        self.__persistence_provider.set(self.__board_id, self.json())
 
     # -----------------------------------------------------------------------------------
     # METHOD JSON
@@ -146,11 +147,25 @@ class Board:
 
         """
             -----------------------------------------------------------------------------
-            Gets the owner of the current board
+            Gets the player_id of the player that owns this board
             :return: Uuid of the user owning the board
             -----------------------------------------------------------------------------
         """
         return self.__player_id
+
+    # -----------------------------------------------------------------------------------
+    # GET OWNER ID METHOD
+    # -----------------------------------------------------------------------------------
+    def get_owner_id(self):
+        """
+            -----------------------------------------------------------------------------
+            Gets the id of the user that owns the player that owns this board
+            :return: Uuid of the user that owns the player that owns this board
+            -----------------------------------------------------------------------------
+        """
+        player = Player(None, None, self.__persistence_provider)
+        player.load(self.__player_id)
+        return player.get_owner()
 
     # -----------------------------------------------------------------------------------
     # GET GAME ID
