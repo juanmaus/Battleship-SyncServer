@@ -1,22 +1,7 @@
 from battleshipsync.models.board import ShootResult
 from battleshipsync.models.dao.player_index import register_player
-from enum import Enum
 import json
 import uuid
-
-
-# ---------------------------------------------------------------------------------------
-# ENUMERATION PLAYER TYPE
-# ---------------------------------------------------------------------------------------
-class PlayerType(Enum):
-    """
-        Determines the types of player available in the game. The human type is to be 
-        used on a game client interface and the computer type is to be used by autonomous 
-        program that connects to the server and plays automatically without any human 
-        intervention.
-    """
-    HUMAN = 1
-    COMPUTER = 2
 
 
 # ---------------------------------------------------------------------------------------
@@ -41,12 +26,13 @@ class Player:
     __current_fleet_value = 0
     __nick_name = ""
     __alive = None
-    __redis = None
+    __is_human = False
+    __persistence_provider = None
 
     # -----------------------------------------------------------------------------------
     # CLASS CONSTRUCTOR
     # -----------------------------------------------------------------------------------
-    def __init__(self, user_id, game_id, redis):
+    def __init__(self, user_id, game_id, persistence_provider):
         """
             To create an instance of player it is only necessary to provide the id of the 
             game and the id of the user who owns the player's instance. 
@@ -56,27 +42,41 @@ class Player:
         self.__user_id = user_id
         self.__game_id = game_id
         self.__player_id = str(uuid.uuid4())
+        self.__persistence_provider = persistence_provider
+
+    # -----------------------------------------------------------------------------------
+    # METHOD HUMAN
+    # -----------------------------------------------------------------------------------
+    def human(self):
+        """
+            Checks if the player is human or computer
+            :return: True if it is human player, false if it is a computer player.
+        """
+        return self.__is_human
 
     # -----------------------------------------------------------------------------------
     # METHOD REGISTER
     # -----------------------------------------------------------------------------------
-    def register(self, nickname):
+    def register(self, nickname, is_human):
         """
             Registers a new player on a given game instance
+            :param is_human: Used to determined if the player is a computer or human
             :param nickname: The nickname that the player will be using
             :return: True if the player was registered successfully
         """
         self.__nick_name = nickname
-        carrier = int(ShootResult.CARRIER)
-        cruise = int(ShootResult.CRUISE)
-        destroyer = int(ShootResult.DESTROYER)
-        submarine = int(ShootResult.SUBMARINE)
-        battleship = int(ShootResult.BATTLESHIP)
+        carrier = int(ShootResult.CARRIER.value)
+        cruise = int(ShootResult.CRUISE.value)
+        destroyer = int(ShootResult.DESTROYER.value)
+        submarine = int(ShootResult.SUBMARINE.value)
+        battleship = int(ShootResult.BATTLESHIP.value)
         self.__current_fleet_value = carrier + destroyer + cruise + submarine + battleship
         self.__points_gained = 0
         self.__alive = True
+        self.__is_human = is_human
         if self.save():
-            register_player(self.static_metadata())
+            return register_player(self.static_metadata())
+        return False
 
     # -----------------------------------------------------------------------------------
     # METHOD EXPORT STATE
@@ -94,7 +94,8 @@ class Player:
             "points_gained": self.__points_gained,
             "current_fleet_value": self.__current_fleet_value,
             "nickname": self.__nick_name,
-            "alive": self.__alive
+            "alive": self.__alive,
+            "is_human": self.__is_human
         }
 
     # -----------------------------------------------------------------------------------
@@ -111,6 +112,7 @@ class Player:
             "user_id": self.__user_id,
             "game_id": self.__game_id,
             "nickname": self.__nick_name,
+            "is_human": self.__is_human
         }
 
     # -----------------------------------------------------------------------------------
@@ -133,8 +135,8 @@ class Player:
             :param player_id: The player's id
             :return: True if loaded and false if not loaded
         """
-        if self.__redis is not None and player_id is not None:
-            player_data = self.__redis.get(player_id)
+        if self.__persistence_provider is not None and player_id is not None:
+            player_data = self.__persistence_provider.get(player_id)
             player = json.loads(player_data)
             self.__player_id = player_id
             self.__nick_name = player['nickname']
@@ -143,6 +145,7 @@ class Player:
             self.__game_id = player['game_id']
             self.__user_id = player['user_id']
             self.__alive = player['alive']
+            self.__is_human = player['is_human']
             return True
         return False
 
@@ -155,8 +158,8 @@ class Player:
             :param redis: reference to redis store client instance
             :return: 
         """
-        if self.__redis is not None:
-            self.__redis.set(self.__player_id, self.json())
+        if self.__persistence_provider is not None:
+            self.__persistence_provider.set(self.__player_id, self.json())
             return True
         return False
 

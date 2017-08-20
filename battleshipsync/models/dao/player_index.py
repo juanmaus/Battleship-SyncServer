@@ -21,6 +21,7 @@ def register_player(player):
         players = json.loads(players_data)
     players.append(player)
     redis.set('players', json.dumps(players))
+    # Release the memory allocation to keep low overhead
     players = None
     return True
 
