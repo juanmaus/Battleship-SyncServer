@@ -1,5 +1,4 @@
 from battleshipsync import redis_store as redis
-from battleshipsync.models.player import Player
 import json
 
 
@@ -15,6 +14,7 @@ def register_player(player):
         :param player: Dictionary of player
         :return: True player was successfully registered
     """
+
     players_data = redis.get('players')
     players = []
     # If there are no players, then we create an empty list
@@ -22,6 +22,7 @@ def register_player(player):
         players = json.loads(players_data)
     players.append(player)
     redis.set('players', json.dumps(players))
+
     # Release the memory allocation to keep low overhead
     players = None
     return True
@@ -55,6 +56,7 @@ def verify_ownership(player_id, user_id):
 # FUNCTION CLASS PLAYER
 # ---------------------------------------------------------------------------------------
 def get_player(player_id):
+    from battleshipsync.models.player import Player
     player_data = redis.get(player_id)
     if player_data is not None:
         player = Player(None, None, redis)

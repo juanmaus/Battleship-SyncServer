@@ -59,7 +59,9 @@ def get_game(game_id):
 def get_game_list():
     keys= []
     games_data = persistance_provider.get('games')
+    from battleshipsync.models.dao.game_index import add_player
     # If there are no players, then we create an empty list
+    add_player("9487f801-75d2-47ad-82f0-1961d40c423b", "fae0421b-9889-4343-8f85-236ca91d9b3e", "HUMAN")
     if games_data is not None:
         games = json.loads(games_data)
         try:

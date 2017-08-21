@@ -76,7 +76,7 @@ class Game:
         self.moves_next = ""
         self.mode = mode
         self.player_layout = player_layout
-        self.players = [owner]
+        self.players = []
         self.__open_spots = player_layout
         self.__persistence_provider = persistence_provider
 
@@ -168,9 +168,7 @@ class Game:
         return {
             "game_id": self.id,
             "open_spots": self.__open_spots,
-            "game_status": self.game_status.value,
-            "moves_next": self.moves_next,
-            "players": self.players
+            "game_status": self.game_status.value
         }
 
     # -----------------------------------------------------------------------------------

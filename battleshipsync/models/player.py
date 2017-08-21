@@ -1,4 +1,3 @@
-from battleshipsync.models.board import ShootResult
 from battleshipsync.models.dao.player_index import register_player
 import json
 import uuid
@@ -53,7 +52,10 @@ class Player:
             Checks if the player is human or computer
             :return: True if it is human player, false if it is a computer player.
         """
-        return self.__is_human
+        if self.__is_human:
+            return "HUMAN"
+        else:
+            return "COMPUTER"
 
     # -----------------------------------------------------------------------------------
     # METHOD REGISTER
@@ -65,6 +67,8 @@ class Player:
             :param nickname: The nickname that the player will be using
             :return: True if the player was registered successfully
         """
+        from battleshipsync.models.dao.game_index import add_player
+        from battleshipsync.models.board import ShootResult
         self.__nick_name = nickname
         carrier = int(ShootResult.CARRIER.value)
         battleship = int(ShootResult.BATTLESHIP.value)
@@ -76,7 +80,7 @@ class Player:
         self.__points_gained = 0
         self.__alive = True
         self.__is_human = is_human
-        if self.save():
+        if self.save() and add_player(self.__game_id, self.__player_id, self.human()):
             return register_player(self.static_metadata())
         return False
 
