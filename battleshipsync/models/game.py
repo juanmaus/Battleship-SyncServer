@@ -1,8 +1,8 @@
 from enum import Enum
 from flask import json
-from battleshipsync.models.dao.game_index import register_game
 import datetime
 import uuid
+
 
 
 # ---------------------------------------------------------------------------------------
@@ -11,7 +11,6 @@ import uuid
 
 
 class GameStatus(Enum):
-
     """
         This enumeration defines the possible status in which a game can be. Initially all
         games are created with WAITING_FOR_PLAYERS status and can be set to active as soon
@@ -27,7 +26,6 @@ class GameStatus(Enum):
 # ENUMERATION GAME MODE
 # ---------------------------------------------------------------------------------------
 class GameMode(Enum):
-
     """
         Defines the mode in which a game should be created. The game mode determines the
         amount of players required to get the game started and the amount of boards that
@@ -46,7 +44,8 @@ class Game:
         unique uuid4 identifier is assigned to the game so it can be uniquely referenced.
         Game instances are persisted using REDIS in-memory data structure storage so that
         the game state is persistent across multiple http requests originated by different
-        player.
+        player. 
+
 
         A game can be created by any registered player in the system an can be created in
         two different modes: 2-player mode and 4-player mode. Initially games are created
@@ -65,20 +64,19 @@ class Game:
     # -----------------------------------------------------------------------------------
     # CLASS CONSTRUCTOR
     # -----------------------------------------------------------------------------------
-    def __init__(self, mode, owner, player_layout, persistence_provider):
+    def __init__(self, mode, player_layout, persistence_provider):
         """
             :param mode: GameMode type. Can be 4PLAYER mode or 2PLAYER mode
-            :param owner: The id of the user that created the game.
             :param player_layout: A list of the player types that can join the game.
         """
         self.id = str(uuid.uuid4())
         self.timestamp = datetime.datetime.now()
         self.game_status = GameStatus.WAITING_FOR_PLAYERS
+        self.owner = ""
+        self.moves_next = ""
         self.mode = mode
-        self.owner = owner
-        self.moves_next = owner
         self.player_layout = player_layout
-        self.players = [owner]
+        self.players = []
         self.__open_spots = player_layout
         self.__persistence_provider = persistence_provider
 
@@ -105,14 +103,12 @@ class Game:
             This method gets the game state as a json string
             :return: json string representation of the current game status
         """
-        return json.dumps(self.export_state(), sort_keys=False, indent=2)
+        return json.dumps(self.export_state())
 
     # -----------------------------------------------------------------------------------
     # METHOD JOIN PLAYER
     # -----------------------------------------------------------------------------------
-    def join_player(self, player):
-        player_data = player.static_metadata()
-        player_id = player_data["player_id"]
+    def join_player(self, player_id):
         if player_id in self.players:
             return False
         ##if player.
@@ -122,12 +118,14 @@ class Game:
         # 3) Add the board id to player and add the player to the player's list.
         # TODO!!!
         self.players.append(player_id)
+        self.save()
         return True
 
     # -----------------------------------------------------------------------------------
     # METHOD REGISTER
     # -----------------------------------------------------------------------------------
     def register(self):
+        from battleshipsync.models.dao.game_index import register_game
         """
             Registers a new game on a game index for filtering purposes
             :return: True if the player was registered successfully
@@ -135,8 +133,6 @@ class Game:
         if self.save():
             return register_game(self.static_metadata())
         return False
-
-
 
     # -----------------------------------------------------------------------------------
     # EXPORT_STATE METHOD
@@ -172,10 +168,9 @@ class Game:
         return {
             "game_id": self.id,
             "open_spots": self.__open_spots,
-            "game_status": self.game_status.value,
-            "moves_next": self.moves_next,
-            "players": self.players
+            "game_status": self.game_status.value
         }
+
     # -----------------------------------------------------------------------------------
     # LOAD METHOD
     # -----------------------------------------------------------------------------------

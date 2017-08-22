@@ -1,4 +1,5 @@
-from battleshipsync import redis_store as redis
+from battleshipsync import redis_store as persistence_provider
+from battleshipsync.models.game import Game
 import json
 
 
@@ -7,58 +8,80 @@ import json
 # ---------------------------------------------------------------------------------------
 def register_game(game):
     """
-        We keep a list of games in our redis in order to check things open spots in gamep
+        We keep a list of games in our persistence_provider in order to check things open spots in game
         and to be able to enumerate all known games. This
-        Redis key serves as an index
-
+        game
+        persistence_provider key serves as an index
         :param game: Dictionary of game
         :return: True game was successfully registered
     """
-    games_data = redis.get('games')
+    games_data = persistence_provider.get('games')
     games = []
     # If there are no games, then we create an empty list
     if games_data is not None:
         games = json.loads(games_data)
     games.append(game)
-    redis.set('games', json.dumps(games))
+    persistence_provider.set('games', json.dumps(games))
     games = None
     return True
 
 
-def add_player(game_id,player_type):
+def add_player(game_id, player_id, player_type):
     """
         Adds a player to the game in the game dictionary
         Also, has the logic to change the game status when game is filled
 
-        :param game: gameId
-        :param player: a playerId
-        :return: True game was successfully registered
+        :param game_id: gameId
+        :param player_type: a player_type
+        :param player_id: a player_id
+        :return: True game was successfully added
     """
-    games_data = redis.get('games')
+    game = Game(None, None, persistence_provider=persistence_provider)  # instance as null to later load from id
+    game.load(game_id)
+    if game.join_player(player_id=player_id):
+        update_open_spots(game_id=game_id, player_type=player_type)
+        return True
+    else:
+        return False
+
+
+def update_open_spots(game_id, player_type):
+    """
+        Updates the persistence provider, removing a spot from it
+
+        :param game_id: Game id
+        :param player_type: a type of player
+        :return: True if spot is successful remove, False is no open spot available
+    """
+    games_data = persistence_provider.get('games')
     games = []
-    newgames= []
+    newgames = []
     # If there are no games, then we create an empty list
     if games_data is not None:
         games = json.loads(games_data)
-        key= None
+        key = None
         try:
             for game in games:
                 if game_id == game["game_id"]:
-                    key = __get_key_in_list(game["open_spots"], player_type)
+                    key = get_key_in_list(game["open_spots"], player_type)
                     if key is not None:
                         del game["open_spots"][key]
+                        newgames.append(game)
                     else:
                         return False
-                    newgames.append(game)
                 else:
                     newgames.append(game)
         except:
             return False
-    games.append(game)
-    redis.set('games', json.dumps(games))
+    persistence_provider.set('games', json.dumps(newgames))
     games = None
-    return json.dumps(newgames, indent=4, sort_keys=True)
+    newgames = None
+    return True
 
+def get_key_in_list(spots, match):
+  for index, spot in enumerate(spots):
+        if spot == match:
+            return index
 
 def move_to_next_player(game_id):
     """
@@ -67,7 +90,7 @@ def move_to_next_player(game_id):
         :param game: gameId
         :return: Next player id to move or None if error
     """
-    games_data = redis.get('games')
+    games_data = persistence_provider.get('games')
     if not games_data:
         return None
 
@@ -83,20 +106,11 @@ def move_to_next_player(game_id):
     next_player_index = (current_player_index + 1) if current_player_index < last_index_of_players else 0
     next_player = game["players"][next_player_index]
     game["moves_next"] = next_player
-
-    redis.set('games', json.dumps(games))
-
+    persistence_provider.set('games', json.dumps(games))
     return next_player
-
-def __get_key_in_list(spots,match):     #Maybe needs to be redefined somewhere else, dunno
-    for index, spot in enumerate(spots):
-        print("huehuehe"+spot)
-        if spot == match:
-            return index
 
 def __find_game(game_id, games):
     for game in games:
         if game_id == game['game_id']:
             return game
-
     return None

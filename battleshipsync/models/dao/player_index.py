@@ -16,6 +16,7 @@ def register_player(player):
         :param player: Dictionary of player
         :return: True player was successfully registered
     """
+
     players_data = redis.get('players')
     players = []
     # If there are no players, then we create an empty list
@@ -23,7 +24,6 @@ def register_player(player):
         players = json.loads(players_data)
     players.append(player)
     redis.set('players', json.dumps(players))
-    
     # Now we create a board for the player once it has been registered on a game
     board = Board(
         player_id=player.get_player_id, 
@@ -32,7 +32,6 @@ def register_player(player):
     )
     board.expand()
     board.save()
-    
     # Release the memory allocation to keep low overhead
     board = None
     players = None
