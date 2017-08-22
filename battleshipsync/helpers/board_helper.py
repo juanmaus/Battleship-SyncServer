@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 from random import randrange
 
-MIN_BOAT_SIZE = 2
-MAX_BOAT_SIZE = 5
+BOARD_SIZE = 10
 
 
 # ---------------------------------------------------------------------------------------
@@ -16,12 +15,12 @@ def board_has_space(
     board_size,
     ):
     """
-    
-    :param direction: 
-    :param position: 
-    :param boat_size: 
-    :param board_size: 
-    :return: 
+
+    :param direction:
+    :param position:
+    :param boat_size:
+    :param board_size:
+    :return:
     """
     if direction == 'UP' or direction == 'LEFT':
         working_axis = ('y' if direction == 'UP' else 'x')
@@ -44,12 +43,12 @@ def hits_boat(
     board_matrix,
     ):
     """
-    
-    :param direction: 
-    :param position: 
-    :param boat_size: 
-    :param board_matrix: 
-    :return: 
+
+    :param direction:
+    :param position:
+    :param boat_size:
+    :param board_matrix:
+    :return:
     """
     if direction == 'UP':
         first_square = position['y']
@@ -89,7 +88,7 @@ def hits_boat(
 # ---------------------------------------------------------------------------------------
 #  FUNCTION POPULATE BOARD
 # ---------------------------------------------------------------------------------------
-def insert_board_in_matrix(
+def insert_boat_in_matrix(
     direction,
     boat_size,
     initial_position,
@@ -97,19 +96,18 @@ def insert_board_in_matrix(
     ):
 
     """
-    
-    :param direction: 
-    :param boat_size: 
-    :param initial_position: 
-    :param board_matrix: 
-    :return: 
+
+    :param direction:
+    :param boat_size:
+    :param initial_position:
+    :param board_matrix:
+    :return:
     """
 
     if direction == 'UP':
         first_square = initial_position['y']
 
-        for currentY in range(first_square + 1 - boat_size, first_square
-                              + 1):
+        for currentY in range(first_square + 1 - boat_size, first_square + 1):
             board_matrix[currentY][initial_position['x']] = boat_size
     elif direction == 'DOWN':
 
@@ -133,22 +131,14 @@ def insert_board_in_matrix(
 
     return board_matrix
 
-
-# ---------------------------------------------------------------------------------------
-#  FUNCTION POPULATE BOARD
-# ---------------------------------------------------------------------------------------
-def get_random_boat_size():
-    return randrange(MIN_BOAT_SIZE, MAX_BOAT_SIZE)
-
-
 # ---------------------------------------------------------------------------------------
 #  FUNCTION POPULATE BOARD
 # ---------------------------------------------------------------------------------------
 def get_random_initial_position(matrix_size):
     """
-    
-    :param matrix_size: 
-    :return: 
+
+    :param matrix_size:
+    :return:
     """
     return {'x': randrange(0, matrix_size), 'y': randrange(0,
                                                            matrix_size)}
@@ -167,12 +157,12 @@ def get_random_direction(
     ):
 
     """
-    
-    :param directions: 
-    :param position: 
-    :param boat_size: 
-    :param board_matrix: 
-    :return: 
+
+    :param directions:
+    :param position:
+    :param boat_size:
+    :param board_matrix:
+    :return:
     """
     if not directions:
         return None
@@ -195,3 +185,14 @@ def get_random_direction(
         return get_random_direction(directions, position, boat_size,
                                     board_matrix)
     return direction
+
+# ---------------------------------------------------------------------------------------
+#  FUNCTION GENERATE EMPTY MATRIX
+# ---------------------------------------------------------------------------------------
+def generate_matrix():
+    matrix = [None] * BOARD_SIZE
+
+    for x in range(0, BOARD_SIZE):
+        matrix[x] = [0] * BOARD_SIZE
+
+    return matrix

@@ -1,5 +1,6 @@
 from enum import Enum
 from battleshipsync.models.player import Player
+from battleshipsync.extensions.game_board_extension import create_board
 import json
 
 
@@ -182,21 +183,16 @@ class Board:
     # -----------------------------------------------------------------------------------
     # METHOD EXPAND
     # -----------------------------------------------------------------------------------
-    def expand(self, size):
+    def expand(self):
         """
             -----------------------------------------------------------------------------
             This method is used to expand a board for the first time and initialize all 
             its possible positions. 
             
-            :param size: the size to which the board is going to be expanded. 
             :return: None
             -----------------------------------------------------------------------------
         """
-        self.__board = []
-        for y in range(0, size):
-            self.__board.append([])
-            for x in range(0, size):
-                self.__board[y].append(0)
+        self.__board = create_board()
         return
         
     # -----------------------------------------------------------------------------------

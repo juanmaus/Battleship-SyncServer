@@ -76,6 +76,3 @@ def get_game_list():
     return jsonify({
         "Error": "No games found, create a new one?"
     }), HTTPStatus.NOT_FOUND
-
-
-

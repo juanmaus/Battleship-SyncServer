@@ -1,4 +1,6 @@
 from battleshipsync import redis_store as redis
+from battleshipsync.models.player import Player
+from battleshipsync.models.board import Board
 import json
 
 
@@ -22,8 +24,16 @@ def register_player(player):
         players = json.loads(players_data)
     players.append(player)
     redis.set('players', json.dumps(players))
-
+    # Now we create a board for the player once it has been registered on a game
+    board = Board(
+        player_id=player.get_player_id, 
+        game_id=player.get_game_id,
+        persistence_provider = redis
+    )
+    board.expand()
+    board.save()
     # Release the memory allocation to keep low overhead
+    board = None
     players = None
     return True
 
@@ -56,10 +66,14 @@ def verify_ownership(player_id, user_id):
 # FUNCTION CLASS PLAYER
 # ---------------------------------------------------------------------------------------
 def get_player(player_id):
-    from battleshipsync.models.player import Player
+    """
+        Searches the REDIS index and loads the instance of player associated to
+        the given player id.
+        :param player_id: The id of the player to load
+    """
     player_data = redis.get(player_id)
     if player_data is not None:
         player = Player(None, None, redis)
-        player.load()
+        player.load(player_id)
         return player
     return None

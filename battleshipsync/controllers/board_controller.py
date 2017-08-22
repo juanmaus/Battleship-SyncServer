@@ -4,10 +4,9 @@ from flask import request, jsonify
 from battleshipsync import redis_store
 from battleshipsync.security.idam import find_user
 from battleshipsync.models.board import Board, ShootResult, parse_board_id
-from battleshipsync.models.player import Player
 from battleshipsync.models.dao.player_index import verify_ownership, get_player
+from battleshipsync.models.dao.game_index import move_to_next_player
 from battleshipsync.extensions.error_handling import ErrorResponse
-from battleshipsync.extensions.error_handling import SuccessResponse
 from flask_jwt import jwt_required, current_identity
 import uuid
 
@@ -103,7 +102,7 @@ def post_torpedo(board_id):
                     if shooter is not None and receiver is not None:
                         shooter.add_points(result)
                         receiver.update_fleet_value(result)
-                        # TODO send message to Game instance to update the next_player' turn
+                        move_to_next_player(board.get_game_id())
                         return jsonify({
                             "result_code": result,
                             "shooter": shooter.export_state(),
