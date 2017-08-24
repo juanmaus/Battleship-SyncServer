@@ -1,5 +1,6 @@
 from battleshipsync import redis_store as persistence_provider
 from battleshipsync.models.game import Game
+from itertools import cycle
 import json
 
 
@@ -38,20 +39,42 @@ def add_player(game_id, player_id, player_type):
     """
     game = Game(None, None, persistence_provider=persistence_provider)  # instance as null to later load from id
     game.load(game_id)
-    if game.join_player(player_id=player_id):
-        update_open_spots(game_id=game_id, player_type=player_type)
+    if game.join_player(player_id=player_id, player_type=player_type):
+        update_game_index(game_id=game_id, gameinfo=game.static_metadata())
         return True
     else:
         return False
 
 
-def update_open_spots(game_id, player_type):
+def move_to_next_player(game_id):
+    """
+        Updates a game(entity and DAO) to move to the next player
+
+        :param game_id: gameId
+        :return: Next player id to move or None if error
+    """
+    game = Game(None, None, persistence_provider=persistence_provider)  # instance as null to later load from id
+    game.load(game_id)
+
+    pool = cycle(game.players)
+    for player in pool:
+        if player == game.moves_next:
+            game.moves_next = next(pool)
+            break
+
+    if game.save():
+        update_game_index(game_id=game_id, gameinfo=game.static_metadata())
+        return True
+    else:
+        return False
+
+def update_game_index(game_id, gameinfo):
     """
         Updates the persistence provider, removing a spot from it
 
         :param game_id: Game id
-        :param player_type: a type of player
-        :return: True if spot is successful remove, False is no open spot available
+        :param gameinfo: full static metadata of a game
+        :return: True if game was successfully updated
     """
     games_data = persistence_provider.get('games')
     games = []
@@ -63,12 +86,7 @@ def update_open_spots(game_id, player_type):
         try:
             for game in games:
                 if game_id == game["game_id"]:
-                    key = get_key_in_list(game["open_spots"], player_type)
-                    if key is not None:
-                        del game["open_spots"][key]
-                        newgames.append(game)
-                    else:
-                        return False
+                    newgames.append(gameinfo)
                 else:
                     newgames.append(game)
         except:
@@ -78,39 +96,8 @@ def update_open_spots(game_id, player_type):
     newgames = None
     return True
 
-def get_key_in_list(spots, match):
-  for index, spot in enumerate(spots):
-        if spot == match:
-            return index
 
-def move_to_next_player(game_id):
-    """
-        Updates a game to move to the next player to play
 
-        :param game: gameId
-        :return: Next player id to move or None if error
-    """
-    games_data = persistence_provider.get('games')
-    if not games_data:
-        return None
 
-    games = json.loads(games_data)
-    game = __find_game(game_id, games)
 
-    if not game:
-        return None
 
-    current_player = game["moves_next"]
-    current_player_index = game["players"].index(current_player)
-    last_index_of_players = len(game["players"]) - 1
-    next_player_index = (current_player_index + 1) if current_player_index < last_index_of_players else 0
-    next_player = game["players"][next_player_index]
-    game["moves_next"] = next_player
-    persistence_provider.set('games', json.dumps(games))
-    return next_player
-
-def __find_game(game_id, games):
-    for game in games:
-        if game_id == game['game_id']:
-            return game
-    return None

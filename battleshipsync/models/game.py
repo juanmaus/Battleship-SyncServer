@@ -44,7 +44,7 @@ class Game:
         unique uuid4 identifier is assigned to the game so it can be uniquely referenced.
         Game instances are persisted using REDIS in-memory data structure storage so that
         the game state is persistent across multiple http requests originated by different
-        player. 
+        player.
 
 
         A game can be created by any registered player in the system an can be created in
@@ -59,7 +59,6 @@ class Game:
 
     __game_id = ""
     __persistence_provider = None
-    __open_spots = []
 
     # -----------------------------------------------------------------------------------
     # CLASS CONSTRUCTOR
@@ -77,7 +76,6 @@ class Game:
         self.mode = mode
         self.player_layout = player_layout
         self.players = []
-        self.__open_spots = player_layout
         self.__persistence_provider = persistence_provider
 
     # -----------------------------------------------------------------------------------
@@ -108,18 +106,49 @@ class Game:
     # -----------------------------------------------------------------------------------
     # METHOD JOIN PLAYER
     # -----------------------------------------------------------------------------------
-    def join_player(self, player_id):
-        if player_id in self.players:
+    def join_player(self, player_id, player_type):
+        if player_id in self.players or player_type not in self.player_layout:
             return False
-        ##if player.
-        # 1) Link userId to Player id, make player id persistant to userId
-        # 2) Create a board for the new player using the current game's spec and initialize
-        # stats
-        # 3) Add the board id to player and add the player to the player's list.
-        # TODO!!!
+
+        if self.first_join():
+            self.owner = player_id
+            self.moves_next = player_id
+        self.player_layout.remove(player_type)
         self.players.append(player_id)
+
+        if self.last_join():
+            self.game_status = GameStatus.ACTIVE
+
+
         self.save()
         return True
+
+
+    # -----------------------------------------------------------------------------------
+    # METHOD CHECK FIRST JOIN
+    # -----------------------------------------------------------------------------------
+    def first_join(self):
+        """
+            This method gets if the game has no current players
+            :return: Bool true if the player count is 0
+        """
+        if len(self.players) == 0:
+            return True
+        else:                   #Redundant else but legible blablabla..
+            return False
+
+    # -----------------------------------------------------------------------------------
+    # METHOD CHECK LAST JOIN
+    # -----------------------------------------------------------------------------------
+    def last_join(self):
+        """
+            This method gets if the game has reached the player limit
+            :return: Bool true if the player layout count is 0
+        """
+        if len(self.player_layout) == 0:
+            return True
+        else:  # Redundant else but legible blablabla..
+            return False
 
     # -----------------------------------------------------------------------------------
     # METHOD REGISTER
@@ -167,8 +196,11 @@ class Game:
         """
         return {
             "game_id": self.id,
-            "open_spots": self.__open_spots,
-            "game_status": self.game_status.value
+            "mode": str(self.mode),
+            "open_spots": self.player_layout,
+            "game_status": str(self.game_status),
+            "moves_next": self.moves_next,
+            "players": self.players
         }
 
     # -----------------------------------------------------------------------------------
