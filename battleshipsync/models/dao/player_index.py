@@ -28,6 +28,7 @@ def register_player(player):
     board = Board(
         player_id=player['player_id'],
         game_id=player['game_id'],
+        board_id=player['board_id'],
         persistence_provider=redis
     )
     board.expand()

@@ -88,7 +88,7 @@ class Player:
         self.__points_gained = 0
         self.__alive = True
         self.__is_human = is_human
-        self.__board_id = uuid.uuid4()
+        self.__board_id = str(uuid.uuid4())
         return self.save() and add_player(self.__game_id, self.__player_id, self.human())
 
     # -----------------------------------------------------------------------------------
