@@ -209,6 +209,7 @@ class Board:
             board_state = json.loads(board_data)
             size = board_state['size']
             print('[DEBUG]: board state: ' + str(board_state))
+            self.__board = []
             for y in range(0, 10):
                 self.__board.append([])
                 for x in range(0, 10):
