@@ -242,14 +242,14 @@ class Board:
                 if len(self.__board[x]) > x:
                     result = self.__board[y][x]
                     if result > 0:
-                        self.__board[y][x] = int(ShootResult.BOMBED)
+                        self.__board[y][x] = -1
                 else:
                     # Return invalid X coordinate
-                    result = int(ShootResult.BAD_X_COORDINATE)
+                    result = -101
             else:
                 # Return invalid Y coordinate
-                result = int(ShootResult.BAD_Y_COORDINATE)
+                result = -102
         else:
             # Return invalid coordinates code.
-            result = int(ShootResult.UNINITIALIZED_BOARD)
+            result = -100
         return result

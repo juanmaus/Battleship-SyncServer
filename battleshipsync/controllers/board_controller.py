@@ -96,7 +96,7 @@ def post_torpedo(board_id):
         
         if board.get_owner_id() is not current_identity.id:
             if torpedo_coordinates is not None:
-                result = board.shoot(torpedo_coordinates['x'], torpedo_coordinates['y'])
+                result = board.shoot(torpedo_coordinates['x_coordinate'], torpedo_coordinates['y_coordinate'])
                 if result >= 0:
                     # We update the state on the redis store
                     board.save()
