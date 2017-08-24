@@ -33,6 +33,7 @@ def post_game():
             "Error": "Invalid game data"
         }), HTTPStatus.BAD_REQUEST
 
+
 # --------------------------------------------------------------------------
 # GET GAME
 # --------------------------------------------------------------------------
@@ -47,13 +48,14 @@ def get_game(game_id):
         return (ErrorResponse('Game does not exists',
                                      'Please enter a valid game id')).as_json(), HTTPStatus.BAD_REQUEST
     else:
-        return game.json()
+        return jsonify(game.export_state())
+
 
 # --------------------------------------------------------------------------
 # GET GAME LIST
 # --------------------------------------------------------------------------
 # Fetches a list of the current joinable games
-@app.route('/api/v1/game/', methods=['GET'])
+@app.route('/api/v1/game', methods=['GET'])
 @jwt_required()
 @enable_jsonp
 def get_game_list():
