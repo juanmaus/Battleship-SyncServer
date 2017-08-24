@@ -74,9 +74,9 @@ class SlackLogHandler(logging.Handler):
             ip=ip,
         )
         slack_event.save()
-        hook = SlackWebhookClient(self.webhook)
-        hook.send(
-            message=slack_event.to_slack_msg(),
-            emoji=":ghost:",
-            username="battleship-server"
-        )
+        #hook = SlackWebhookClient(self.webhook)
+        #hook.send(
+        #    message=slack_event.to_slack_msg(),
+        #    emoji=":ghost:",
+        #   username="battleship-server"
+        #)

@@ -1,5 +1,6 @@
 from battleshipsync import redis_store as redis
 from battleshipsync.models.board import Board
+from battleshipsync import app
 import json
 
 
@@ -27,6 +28,7 @@ def register_player(player):
     board = Board(
         player_id=player['player_id'],
         game_id=player['game_id'],
+        board_id=player['board_id'],
         persistence_provider=redis
     )
     board.expand()
@@ -51,10 +53,12 @@ def verify_ownership(player_id, user_id):
     players = []
     # If there are no players, then we create an empty list
     if players_data is not None:
+        app.logger.info('Reading players data... for player: [' + player_id + '] with user: ['+user_id+']')
         players = json.loads(players_data)
+        app.logger.info('Players loaded... List: ' + json.dumps(players))
     try:
         for player in players:
-            if player['player_id'] is player_id and player['user_id'] is user_id:
+            if player['player_id'] == player_id and player['user_id'] == user_id:
                 return True
         return False
     except:

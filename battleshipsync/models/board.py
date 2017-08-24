@@ -4,20 +4,6 @@ from battleshipsync.extensions.game_board_extension import create_board
 import json
 
 
-def parse_board_id(board_id):
-    """
-        ---------------------------------------------------------------------------------   
-        :param board_id: the id of the board. 
-        :return: A dictionary with the player' id and game' id
-        ---------------------------------------------------------------------------------
-    """
-    game_id, player_id = board_id.split("+")
-    return {
-        "game_id": game_id,
-        "player_id": player_id
-    }
-
-
 # ---------------------------------------------------------------------------------------
 # ENUMERATION SHOOT RESULT
 # ---------------------------------------------------------------------------------------
@@ -92,7 +78,7 @@ class Board:
     # -----------------------------------------------------------------------------------
     # CONSTRUCTOR METHOD
     # -----------------------------------------------------------------------------------
-    def __init__(self, player_id, game_id, persistence_provider):
+    def __init__(self, player_id, game_id, board_id, persistence_provider):
         """
             -----------------------------------------------------------------------------
             Creates instances of Board class
@@ -102,7 +88,7 @@ class Board:
         """
         self.__player_id = player_id
         self.__game_id = game_id
-        self.__board_id = self.__build_id()
+        self.__board_id = board_id
         self.__persistence_provider = persistence_provider
 
     # -----------------------------------------------------------------------------------
@@ -128,18 +114,6 @@ class Board:
             :return: json string representation of the current board status
         """
         return json.dumps(self.export_state())
-
-    # -----------------------------------------------------------------------------------
-    # METHOD BUILD ID
-    # -----------------------------------------------------------------------------------
-    def __build_id(self):
-        """
-            -----------------------------------------------------------------------------
-            Computes the board's id value from the given player_id and game_id
-            :return: string
-            -----------------------------------------------------------------------------
-        """
-        return "" + self.__game_id + "+" + self.__player_id
 
     # -----------------------------------------------------------------------------------
     # GET PLAYER ID METHOD
@@ -234,10 +208,13 @@ class Board:
         if board_data is not None:
             board_state = json.loads(board_data)
             size = board_state['size']
-            for y in range(0, size):
+            print('[DEBUG]: board state: ' + str(board_state))
+            self.__board = []
+            for y in range(0, 10):
                 self.__board.append([])
-                for x in range(0, size):
-                    self.__board[y][x].append(board_state['board'][y][x])
+                for x in range(0, 10):
+                    self.__board[y].append(board_state['board'][y][x])
+            print('[DEBUG]: board state after load: ' + str(self.__board))
             self.__player_id = board_state['player_id']
             self.__board_id = board_state['board_id']
             self.__game_id = board_state['game_id']
@@ -265,14 +242,14 @@ class Board:
                 if len(self.__board[x]) > x:
                     result = self.__board[y][x]
                     if result > 0:
-                        self.__board[y][x] = int(ShootResult.BOMBED)
+                        self.__board[y][x] = -1
                 else:
                     # Return invalid X coordinate
-                    result = int(ShootResult.BAD_X_COORDINATE)
+                    result = -101
             else:
                 # Return invalid Y coordinate
-                result = int(ShootResult.BAD_Y_COORDINATE)
+                result = -102
         else:
             # Return invalid coordinates code.
-            result = int(ShootResult.UNINITIALIZED_BOARD)
+            result = -100
         return result
