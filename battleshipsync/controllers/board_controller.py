@@ -105,8 +105,10 @@ def post_torpedo(board_id):
                     shooter = get_player(torpedo_coordinates['shooter'])
                     receiver = get_player(board.get_player_id())
                     if shooter is not None and receiver is not None:
-                        shooter.add_points(result)
-                        receiver.update_fleet_value(result)
+                        print('Shooter and affected found!... moving on')
+                        if result > 0:
+                            shooter.add_points(result)
+                            receiver.update_fleet_value(result)
                         move_to_next_player(board.get_game_id())
                         s = shooter.export_state()
                         r = receiver.export_state()
@@ -114,7 +116,7 @@ def post_torpedo(board_id):
                         receiver = None
                         return jsonify({
                             "result_code": result,
-                            "shooter": r,
+                            "shooter": s,
                             "receiver": r
                         }), HTTPStatus.CREATED
                     else:
