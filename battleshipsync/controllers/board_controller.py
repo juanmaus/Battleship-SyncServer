@@ -38,7 +38,9 @@ def get_board(board_id):
                 persistence_provider=redis_store
             )
             board.load(board_data)
-            return jsonify(board.export_state()), 200
+            result = board.export_state()
+            board = None
+            return jsonify(result), 200
         return jsonify({
             "Error": True,
             "Message": "You are not the owner of the requested board. Only owner can request he's board"
@@ -109,10 +111,14 @@ def post_torpedo(board_id):
                         shooter.add_points(result)
                         receiver.update_fleet_value(result)
                         move_to_next_player(board.get_game_id())
+                        s = shooter.export_state()
+                        r = receiver.export_state()
+                        shooter = None
+                        receiver = None
                         return jsonify({
                             "result_code": result,
-                            "shooter": shooter.export_state(),
-                            "receiver": receiver.export_state()
+                            "shooter": r,
+                            "receiver": r
                         }), HTTPStatus.CREATED
                     else:
                         app.logger.error('If you get here...This shit is nasty... players not found for transaction')
