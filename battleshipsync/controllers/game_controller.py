@@ -61,14 +61,14 @@ def get_game(game_id):
 def get_game_list():
     keys= []
     games_data = persistance_provider.get('games')
-    from battleshipsync.models.dao.game_index import add_player
+    from battleshipsync.models.dao.game_index import move_to_next_player
     # If there are no players, then we create an empty list
-    add_player("9487f801-75d2-47ad-82f0-1961d40c423b", "fae0421b-9889-4343-8f85-236ca91d9b3e", "HUMAN")
+    #move_to_next_player("cad87fe9-99e8-4665-aae7-b1a96a1f4234") Used to test function
     if games_data is not None:
         games = json.loads(games_data)
         try:
             for game in games:
-                if game["game_status"] is GameStatus.WAITING_FOR_PLAYERS.value:
+                if game["game_status"] == str(GameStatus.WAITING_FOR_PLAYERS):
                     keys.append(game["game_id"])
             return jsonify(keys)
         except:
