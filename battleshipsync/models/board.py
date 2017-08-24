@@ -211,7 +211,7 @@ class Board:
             for y in range(0, size):
                 self.__board.append([])
                 for x in range(0, size):
-                    self.__board[y][x].append(board_state['board'][y][x])
+                    self.__board[y].append(board_state['board'][y][x])
             self.__player_id = board_state['player_id']
             self.__board_id = board_state['board_id']
             self.__game_id = board_state['game_id']
