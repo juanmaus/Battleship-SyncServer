@@ -1,4 +1,3 @@
-from battleshipsync.models.dao.player_index import register_player
 import json
 import uuid
 
@@ -88,9 +87,7 @@ class Player:
         self.__points_gained = 0
         self.__alive = True
         self.__is_human = is_human
-        if self.save() and add_player(self.__game_id, self.__player_id, self.human()):
-            return register_player(self.static_metadata())
-        return False
+        return self.save() and add_player(self.__game_id, self.__player_id, self.human())
 
     # -----------------------------------------------------------------------------------
     # METHOD EXPORT STATE
@@ -182,7 +179,7 @@ class Player:
             -----------------------------------------------------------------------------
         """
         return self.__user_id
-        
+
     # -----------------------------------------------------------------------------------
     # METHOD GET PLAYER ID
     # -----------------------------------------------------------------------------------
@@ -194,7 +191,7 @@ class Player:
             -----------------------------------------------------------------------------
         """
         return self.__player_id
-        
+
     # -----------------------------------------------------------------------------------
     # METHOD GET GAME ID
     # -----------------------------------------------------------------------------------

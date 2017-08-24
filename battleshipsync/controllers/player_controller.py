@@ -3,6 +3,7 @@ from flask import jsonify, request
 from battleshipsync import app, redis_store
 from battleshipsync.models.player import Player
 from battleshipsync import redis_store as redis
+from battleshipsync.models.dao.player_index import register_player
 from flask_jwt import jwt_required, current_identity
 
 
@@ -25,7 +26,12 @@ def post_game_player(game_id):
     if player_data is not None and user_id is not None:
         player = Player(user_id=user_id, game_id=game_id, persistence_provider=redis)
         if player.register(nickname=player_data['nickname'], is_human=player_data['is_human']):
-            return jsonify(player.export_state()), int(HTTPStatus.CREATED)
+            if register_player(player.export_state()):
+                return jsonify(player.export_state()), int(HTTPStatus.CREATED)
+            else:
+                return jsonify({
+                    "Error": "Unable to register player"
+                }), HTTPStatus.INTERNAL_SERVER_ERROR
         else:
             return jsonify({
                 "Error": "Unable to register player"

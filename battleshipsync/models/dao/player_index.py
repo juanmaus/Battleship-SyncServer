@@ -11,7 +11,7 @@ def register_player(player):
         We keep a list of player in our redis in order to check things like ownership
         between player and user and to be able to enumerate all known players. This
         Redis key serves as an index 
-        
+
         :param player: Dictionary of player
         :return: True player was successfully registered
     """
@@ -25,9 +25,9 @@ def register_player(player):
     redis.set('players', json.dumps(players))
     # Now we create a board for the player once it has been registered on a game
     board = Board(
-        player_id=player.get_player_id, 
+        player_id=player.get_player_id,
         game_id=player.get_game_id,
-        persistence_provider = redis
+        persistence_provider=redis
     )
     board.expand()
     board.save()

@@ -2,8 +2,7 @@ from http import HTTPStatus
 from battleshipsync import app
 from flask import request, jsonify
 from battleshipsync import redis_store
-from battleshipsync.security.idam import find_user
-from battleshipsync.models.board import Board, ShootResult, parse_board_id
+from battleshipsync.models.board import Board, parse_board_id
 from battleshipsync.models.dao.player_index import verify_ownership
 from battleshipsync.helpers.player_helper import get_player
 from battleshipsync.models.dao.game_index import move_to_next_player
