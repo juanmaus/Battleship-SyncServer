@@ -34,6 +34,7 @@ def get_board(board_id):
             board = Board(
                 game_id=board['game_id'],
                 player_id=board['player_id'],
+                board_id=board_id,
                 persistence_provider=redis_store
             )
             board.load(board_data)
