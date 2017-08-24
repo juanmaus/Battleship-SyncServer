@@ -56,7 +56,7 @@ def get_player(player_id):
         user_id = current_identity.id
         player = Player(user_id=user_id, game_id=None, persistence_provider=redis)
         if player.load(player_id=player_id):
-            return jsonify(player.export_state), HTTPStatus.OK
+            return jsonify(player.export_state()), HTTPStatus.OK
         else:
             return jsonify({
                 "Error": "Player not found"
