@@ -70,7 +70,8 @@ def post_torpedo(board_id):
         
             {
                 "x_coordinate": 3,
-                "y_coordinate": 4
+                "y_coordinate": 4, 
+                "shooter": "56c142a9-8946-4b50-9e12-e12867573d3f"
             }
         
         :param board_id: The id of the board to where the 
@@ -101,7 +102,7 @@ def post_torpedo(board_id):
                     # We update the state on the redis store
                     board.save()
                     print('Torpedo was sent: shooter: ['+current_identity.id + '] destination ->> [' + board.get_player_id() + ']')
-                    shooter = get_player(current_identity.id)
+                    shooter = get_player(torpedo_coordinates['shooter'])
                     receiver = get_player(board.get_player_id())
                     if shooter is not None and receiver is not None:
                         shooter.add_points(result)
