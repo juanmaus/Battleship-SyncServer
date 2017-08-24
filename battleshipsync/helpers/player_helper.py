@@ -1,5 +1,6 @@
 from battleshipsync import redis_store as redis
 from battleshipsync.models.player import Player
+from battleshipsync import app
 
 
 # ---------------------------------------------------------------------------------------

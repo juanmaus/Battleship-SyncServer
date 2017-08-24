@@ -1,5 +1,6 @@
 from battleshipsync import redis_store as redis
 from battleshipsync.models.board import Board
+from battleshipsync import app
 import json
 
 
@@ -51,7 +52,9 @@ def verify_ownership(player_id, user_id):
     players = []
     # If there are no players, then we create an empty list
     if players_data is not None:
+        app.logger.info('Reading players data...')
         players = json.loads(players_data)
+        app.logger.info('Players loaded... List: ' + players_data)
     try:
         for player in players:
             if player['player_id'] is player_id and player['user_id'] is user_id:
