@@ -106,7 +106,7 @@ def post_torpedo(board_id):
                     receiver = get_player(board.get_player_id())
                     if shooter is not None and receiver is not None:
                         print('Shooter and affected found!... moving on')
-                        app.logger.info('Shoot result was: [' + result + ']')
+                        app.logger.info('Shoot result was: [' + str(result) + ']')
                         if result > 0:
                             shooter.add_points(result)
                             receiver.update_fleet_value(result)
