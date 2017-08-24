@@ -25,8 +25,8 @@ def register_player(player):
     redis.set('players', json.dumps(players))
     # Now we create a board for the player once it has been registered on a game
     board = Board(
-        player_id=player.get_player_id(),
-        game_id=player.get_game_id(),
+        player_id=player['player_id'],
+        game_id=player['game_id'],
         persistence_provider=redis
     )
     board.expand()
