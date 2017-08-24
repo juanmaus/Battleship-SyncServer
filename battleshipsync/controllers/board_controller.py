@@ -101,7 +101,7 @@ def post_torpedo(board_id):
                 if result >= 0:
                     # We update the state on the redis store
                     board.save()
-                    print('Torpedo was sent: shooter: ['+current_identity.id + '] destination ->> [' + board.get_player_id() + ']')
+                    app.logger.info('Torpedo was sent: shooter: ['+current_identity.id + '] destination ->> [' + board.get_player_id() + ']')
                     shooter = get_player(torpedo_coordinates['shooter'])
                     receiver = get_player(board.get_player_id())
                     if shooter is not None and receiver is not None:
@@ -109,7 +109,10 @@ def post_torpedo(board_id):
                         if result > 0:
                             shooter.add_points(result)
                             receiver.update_fleet_value(result)
+                            app.logger.info('Boat was damaged by torpedo...')
+                        app.logger.info('moving to next player...')
                         move_to_next_player(board.get_game_id())
+                        app.logger.info('building result...')
                         s = shooter.export_state()
                         r = receiver.export_state()
                         shooter = None
