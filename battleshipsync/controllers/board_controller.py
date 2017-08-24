@@ -62,17 +62,13 @@ def post_torpedo(board_id):
         ---------------------------------------------------------------------------------
         This method allows to drop a torpedo in a given pair of coordinates on a board belonging 
         to an opponent that is currently playing within the same game instance. The boards are
-        uniquely identified by a key formed from the game's id and the player' id like in:
-        
-            [<game_id>:<player_id>]
+        uniquely identified by a key. 
             
         In order to specify the coordinates that are going to indicate the location where 
         the torpedo is going to be sent, the following payload must be provided (example 
         values):
         
             {
-                "shooter_id" : "1c1c4e42-7903-11e7-b5a5-be2ee3b06ff4",
-                "destination_board": "1c1b28ac-7973-11e7-b5a5-be2e44b06b34:1c1b2e42-7973-11e7-b5a5-be2e44b06b34",
                 "x_coordinate": 3,
                 "y_coordinate": 4
             }
@@ -84,7 +80,6 @@ def post_torpedo(board_id):
     """
     torpedo_coordinates = request.get_json()
     board_data = redis_store.get(board_id)
-    shooter_id = torpedo_coordinates['shooter_id']
 
     # First we check if the board instance actually exists within redis store.
     if board_data is not None:
@@ -105,7 +100,7 @@ def post_torpedo(board_id):
                 if result >= 0:
                     # We update the state on the redis store
                     board.save()
-                    shooter = get_player(shooter_id)
+                    shooter = get_player(current_identity.id)
                     receiver = get_player(board.get_player_id())
                     if shooter is not None and receiver is not None:
                         shooter.add_points(result)
