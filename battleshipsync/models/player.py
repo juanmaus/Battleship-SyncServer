@@ -1,5 +1,6 @@
 import json
 import uuid
+from battleshipsync.models.dao.game_index import add_player
 
 
 # ---------------------------------------------------------------------------------------
@@ -74,14 +75,13 @@ class Player:
             :return: True if the player was registered successfully
             -----------------------------------------------------------------------------
         """
-        from battleshipsync.models.dao.game_index import add_player
-        from battleshipsync.models.board import ShootResult
+
         self.__nick_name = nickname
-        carrier = int(ShootResult.CARRIER.value)
-        battleship = int(ShootResult.BATTLESHIP.value)
-        cruise = int(ShootResult.CRUISE.value)
-        submarine = int(ShootResult.SUBMARINE.value)
-        destroyer = int(ShootResult.DESTROYER.value)
+        carrier = 5*5
+        battleship = 4*4
+        cruise = 3*3
+        submarine = 3*3
+        destroyer = 2*2
 
         self.__current_fleet_value = carrier + destroyer + (cruise * 2) + submarine + battleship
         self.__points_gained = 0

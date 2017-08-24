@@ -11,7 +11,7 @@ def parse_board_id(board_id):
         :return: A dictionary with the player' id and game' id
         ---------------------------------------------------------------------------------
     """
-    game_id, player_id = board_id.split(",")
+    game_id, player_id = board_id.split("+")
     return {
         "game_id": game_id,
         "player_id": player_id
@@ -22,14 +22,14 @@ def parse_board_id(board_id):
 # ENUMERATION SHOOT RESULT
 # ---------------------------------------------------------------------------------------
 class ShootResult(Enum):
-    
+
     """
         ---------------------------------------------------------------------------------
         This enumeration defines the possible types of shooting results that can be produced 
         when shooting into given coordinates. 
         ---------------------------------------------------------------------------------
     """
-    
+
     BAD_Y_COORDINATE = -102
     BAD_X_COORDINATE = -101
     UNINITIALIZED_BOARD = -100
@@ -40,13 +40,13 @@ class ShootResult(Enum):
     DESTROYER = 2
     NOTHING = 0
     BOMBED = -1
-    
-    
+
+
 # ---------------------------------------------------------------------------------------
 # CLASS BOARD
 # ---------------------------------------------------------------------------------------
 class Board:
-    
+
     """
         ---------------------------------------------------------------------------------
         Represents a board within a game. Boards are serialized into json objects and 
@@ -78,19 +78,19 @@ class Board:
         operations are performed to the board instance. 
         ---------------------------------------------------------------------------------
     """
-    
+
     # -----------------------------------------------------------------------------------
     # CLASS ATTRIBUTES
     # -----------------------------------------------------------------------------------
-    
+
     __board = []
     __game_id = ""
     __player_id = ""
     __board_id = ""
     __persistence_provider = None
-    
+
     # -----------------------------------------------------------------------------------
-    # CONSTRUCTOR METHOD 
+    # CONSTRUCTOR METHOD
     # -----------------------------------------------------------------------------------
     def __init__(self, player_id, game_id, persistence_provider):
         """
@@ -139,7 +139,7 @@ class Board:
             :return: string
             -----------------------------------------------------------------------------
         """
-        return "" + self.__game_id + ":" + self.__player_id
+        return "" + self.__game_id + "+" + self.__player_id
 
     # -----------------------------------------------------------------------------------
     # GET PLAYER ID METHOD
@@ -194,7 +194,7 @@ class Board:
         """
         self.__board = create_board()
         return
-        
+
     # -----------------------------------------------------------------------------------
     # EXPORT_STATE METHOD
     # -----------------------------------------------------------------------------------
@@ -213,12 +213,12 @@ class Board:
             "size": len(self.__board)
         }
         return state
-        
+
     # -----------------------------------------------------------------------------------
     # LOAD METHOD
     # -----------------------------------------------------------------------------------
     def load(self, board_data):
-        
+
         """
             -----------------------------------------------------------------------------
             Given a json string that contains a persistent state of a board, deserializes
@@ -230,7 +230,7 @@ class Board:
             :return: None
             -----------------------------------------------------------------------------
         """
-        
+
         if board_data is not None:
             board_state = json.loads(board_data)
             size = board_state['size']
@@ -241,7 +241,7 @@ class Board:
             self.__player_id = board_state['player_id']
             self.__board_id = board_state['board_id']
             self.__game_id = board_state['game_id']
-        
+
     # -----------------------------------------------------------------------------------
     # METHOD SHOOT
     # -----------------------------------------------------------------------------------
