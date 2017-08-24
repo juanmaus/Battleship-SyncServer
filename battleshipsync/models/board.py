@@ -4,20 +4,6 @@ from battleshipsync.extensions.game_board_extension import create_board
 import json
 
 
-def parse_board_id(board_id):
-    """
-        ---------------------------------------------------------------------------------   
-        :param board_id: the id of the board. 
-        :return: A dictionary with the player' id and game' id
-        ---------------------------------------------------------------------------------
-    """
-    game_id, player_id = board_id.split("+")
-    return {
-        "game_id": game_id,
-        "player_id": player_id
-    }
-
-
 # ---------------------------------------------------------------------------------------
 # ENUMERATION SHOOT RESULT
 # ---------------------------------------------------------------------------------------
@@ -92,7 +78,7 @@ class Board:
     # -----------------------------------------------------------------------------------
     # CONSTRUCTOR METHOD
     # -----------------------------------------------------------------------------------
-    def __init__(self, player_id, game_id, persistence_provider):
+    def __init__(self, player_id, game_id, board_id, persistence_provider):
         """
             -----------------------------------------------------------------------------
             Creates instances of Board class
@@ -102,7 +88,7 @@ class Board:
         """
         self.__player_id = player_id
         self.__game_id = game_id
-        self.__board_id = self.__build_id()
+        self.__board_id = board_id
         self.__persistence_provider = persistence_provider
 
     # -----------------------------------------------------------------------------------
@@ -128,18 +114,6 @@ class Board:
             :return: json string representation of the current board status
         """
         return json.dumps(self.export_state())
-
-    # -----------------------------------------------------------------------------------
-    # METHOD BUILD ID
-    # -----------------------------------------------------------------------------------
-    def __build_id(self):
-        """
-            -----------------------------------------------------------------------------
-            Computes the board's id value from the given player_id and game_id
-            :return: string
-            -----------------------------------------------------------------------------
-        """
-        return "" + self.__game_id + "+" + self.__player_id
 
     # -----------------------------------------------------------------------------------
     # GET PLAYER ID METHOD

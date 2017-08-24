@@ -24,6 +24,7 @@ class Player:
     __player_id = ""
     __user_id = None
     __game_id = None
+    __board_id = None
     __points_gained = 0
     __current_fleet_value = 0
     __nick_name = ""
@@ -87,6 +88,7 @@ class Player:
         self.__points_gained = 0
         self.__alive = True
         self.__is_human = is_human
+        self.__board_id = uuid.uuid4()
         return self.save() and add_player(self.__game_id, self.__player_id, self.human())
 
     # -----------------------------------------------------------------------------------
@@ -108,7 +110,8 @@ class Player:
             "current_fleet_value": self.__current_fleet_value,
             "nickname": self.__nick_name,
             "alive": self.__alive,
-            "is_human": self.__is_human
+            "is_human": self.__is_human, 
+            "board_id": self.__board_id
         }
 
     # -----------------------------------------------------------------------------------
@@ -127,7 +130,8 @@ class Player:
             "user_id": self.__user_id,
             "game_id": self.__game_id,
             "nickname": self.__nick_name,
-            "is_human": self.__is_human
+            "is_human": self.__is_human,
+            "board_id": self.__board_id
         }
 
     # -----------------------------------------------------------------------------------
@@ -165,6 +169,7 @@ class Player:
             self.__user_id = player['user_id']
             self.__alive = player['alive']
             self.__is_human = player['is_human']
+            self.__board_id = player['board_id']
             return True
         return False
 
@@ -203,6 +208,18 @@ class Player:
             -----------------------------------------------------------------------------
         """
         return self.__game_id
+        
+    # -----------------------------------------------------------------------------------
+    # METHOD GET BOARD ID
+    # -----------------------------------------------------------------------------------
+    def get_board_id(self):
+        """
+            -----------------------------------------------------------------------------
+            Gets the id of the player's board
+            :return: 
+            -----------------------------------------------------------------------------
+        """
+        return self.__board_id
 
     # -----------------------------------------------------------------------------------
     # METHOD SAVE

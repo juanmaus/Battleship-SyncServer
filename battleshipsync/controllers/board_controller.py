@@ -9,6 +9,7 @@ from battleshipsync.models.dao.game_index import move_to_next_player
 from battleshipsync.extensions.error_handling import ErrorResponse
 from flask_jwt import jwt_required, current_identity
 import uuid
+import json
 
 
 # ---------------------------------------------------------------------------------------
@@ -16,7 +17,7 @@ import uuid
 # ---------------------------------------------------------------------------------------
 @app.route('/api/v1/board/<board_id>', methods=['GET'])
 @jwt_required()
-def get_initial_board(board_id):
+def get_board(board_id):
     """
         This endpoint allows a user to get it's current board. This method will only allow
         the player's own board. If another player's board is attempted to access, then a 
@@ -25,15 +26,17 @@ def get_initial_board(board_id):
     """
     if board_id is not None:
         # Check current identity matches owner of the board.
-        identifiers = parse_board_id(board_id)
-        if verify_ownership(player_id=identifiers['player_id'], user_id=current_identity.id):
+        board_data = redis_store.get(board_id)
+        board = json.loads(board_data)
+        if verify_ownership(player_id=board['player_id'], user_id=current_identity.id):
             # If the user is the actual owner of the board, then we can provide the complete
             # and updated representation of the board.
             board = Board(
-                game_id=identifiers['game_id'],
-                player_id=identifiers['player_id'],
+                game_id=board['game_id'],
+                player_id=board['player_id'],
                 persistence_provider=redis_store
             )
+            board.load(board_data)
             return jsonify(board.export_state()), 200
         return jsonify({
             "Error": True,
@@ -82,15 +85,17 @@ def post_torpedo(board_id):
 
     # First we check if the board instance actually exists within redis store.
     if board_data is not None:
-
+        brt = json.loads(board_data)
         # Next we verify the user is not trying to send torpedo to his own board.
-        identifiers = parse_board_id(board_id)
 
         board = Board(
-            game_id=identifiers['game_id'],
-            player_id=identifiers['player_id'],
+            game_id=brt['game_id'],
+            player_id=brt['player_id'],
+            board_id=brt['board_id'],
             persistence_provider=redis_store
         )
+        board.load(board_data)
+        
         if board.get_owner_id() is not current_identity.id:
             if torpedo_coordinates is not None:
                 result = board.shoot(torpedo_coordinates['x'], torpedo_coordinates['y'])
