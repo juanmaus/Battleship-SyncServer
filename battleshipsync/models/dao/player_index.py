@@ -53,12 +53,12 @@ def verify_ownership(player_id, user_id):
     players = []
     # If there are no players, then we create an empty list
     if players_data is not None:
-        app.logger.info('Reading players data...')
+        app.logger.info('Reading players data... for player: [' + player_id + '] with user: ['+user_id+']')
         players = json.loads(players_data)
         app.logger.info('Players loaded... List: ' + json.dumps(players))
     try:
         for player in players:
-            if player['player_id'] is player_id and player['user_id'] is user_id:
+            if player['player_id'] == player_id and player['user_id'] == user_id:
                 return True
         return False
     except:
