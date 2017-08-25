@@ -79,6 +79,7 @@ def post_torpedo(board_id):
                  given board. 
         ---------------------------------------------------------------------------------
     """
+
     torpedo_coordinates = request.get_json()
     board_data = redis_store.get(board_id)
 

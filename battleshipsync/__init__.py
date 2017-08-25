@@ -6,6 +6,7 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 from flask_jwt import JWT
 from flask_redis import FlaskRedis
+from flask_cors import CORS
 from logging.handlers import RotatingFileHandler
 
 # ------------------------------------------------------------------------------
@@ -16,7 +17,7 @@ __version__ = '1.0'
 app = Flask('battleshipsync')
 app.config.from_object('config')
 app.debug = True
-
+CORS(app)
 # ------------------------------------------------------------------------------
 # SETUP LOGGING
 # ------------------------------------------------------------------------------
