@@ -98,7 +98,7 @@ def post_torpedo(board_id):
         app.logger.info('Instantiating board...')
         board.load(board_data)
 
-        app.logger.info('board loaded with data: ' + board_data)
+        app.logger.info('board loaded with data: ' + str(board_data))
 
         app.logger.info('Getting shooter...')
         shooter = get_player(torpedo_coordinates['shooter'])
