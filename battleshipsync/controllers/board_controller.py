@@ -83,6 +83,7 @@ def post_torpedo(board_id):
     board_data = redis_store.get(board_id)
 
     # First we check if the board instance actually exists within redis store.
+    app.logger.info('Checking board...')
     if board_data is not None:
         brt = json.loads(board_data)
         # Next we verify the user is not trying to send torpedo to his own board.
@@ -93,14 +94,24 @@ def post_torpedo(board_id):
             board_id=brt['board_id'],
             persistence_provider=redis_store
         )
+
+        app.logger.info('Instantiating board...')
         board.load(board_data)
 
+        app.logger.info('board loaded with data: ' + board_data)
+
+        app.logger.info('Getting shooter...')
         shooter = get_player(torpedo_coordinates['shooter'])
+
+        app.logger.info('Getting receiver...')
         receiver = get_player(board.get_player_id())
-        app.logger.info(board_data)
+
         if board.get_owner_id() != current_identity.id and current_identity.id == shooter.get_owner():
+            app.logger.info('Seems its working...')
+
             if torpedo_coordinates is not None:
                 result = board.shoot(torpedo_coordinates['x_coordinate'], torpedo_coordinates['y_coordinate'])
+
                 if result >= 0:
                     # We update the state on the redis store
                     board.save()
