@@ -94,16 +94,18 @@ def post_torpedo(board_id):
             persistence_provider=redis_store
         )
         board.load(board_data)
-        
-        if board.get_owner_id() is not current_identity.id:
+
+        shooter = get_player(torpedo_coordinates['shooter'])
+        receiver = get_player(board.get_player_id())
+
+        if board.get_owner_id() != current_identity.id and current_identity.id == shooter.get_owner():
             if torpedo_coordinates is not None:
                 result = board.shoot(torpedo_coordinates['x_coordinate'], torpedo_coordinates['y_coordinate'])
                 if result >= 0:
                     # We update the state on the redis store
                     board.save()
                     app.logger.info('Torpedo was sent: shooter: ['+current_identity.id + '] destination ->> [' + board.get_player_id() + ']')
-                    shooter = get_player(torpedo_coordinates['shooter'])
-                    receiver = get_player(board.get_player_id())
+
                     if shooter is not None and receiver is not None:
                         print('Shooter and affected found!... moving on')
                         app.logger.info('Shoot result was: [' + str(result) + ']')
@@ -138,16 +140,16 @@ def post_torpedo(board_id):
                         'Invalid coordinates for torpedo',
                         'You cannot shoot to nowhere. Provide a valid json payload to shoot'
                     ).get()
-                ), HTTPStatus.BAD_REQUEST
+                ), int(HTTPStatus.BAD_REQUEST)
         else:
             return jsonify(ErrorResponse('Invalid torpedo operation',
-                                         'Dude, you cannot shoot your own crappy boats!')).get(), HTTPStatus.BAD_REQUEST
+                                         'Dude, you cannot shoot your own crappy boats nor steal identities...!')).get(), int(HTTPStatus.BAD_REQUEST)
     else:
         return jsonify(
             ErrorResponse(
                 'Unable to find board',
                 'The provided board is does not correspond to a valid board'
             ).get()
-        ), HTTPStatus.NOT_FOUND
+        ), int(HTTPStatus.NOT_FOUND)
 
 
