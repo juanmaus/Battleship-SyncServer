@@ -97,7 +97,7 @@ def post_torpedo(board_id):
 
         shooter = get_player(torpedo_coordinates['shooter'])
         receiver = get_player(board.get_player_id())
-
+        app.logger.info(board_data)
         if board.get_owner_id() != current_identity.id and current_identity.id == shooter.get_owner():
             if torpedo_coordinates is not None:
                 result = board.shoot(torpedo_coordinates['x_coordinate'], torpedo_coordinates['y_coordinate'])

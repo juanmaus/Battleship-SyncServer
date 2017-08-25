@@ -207,7 +207,7 @@ class Board:
 
         if board_data is not None:
             board_state = json.loads(board_data)
-            size = board_state['size']
+            size = 10
             print('[DEBUG]: board state: ' + str(board_state))
             self.__board = []
             for y in range(0, 10):

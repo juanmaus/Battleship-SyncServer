@@ -6,6 +6,7 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 from flask_jwt import JWT
 from flask_redis import FlaskRedis
+from logging.handlers import RotatingFileHandler
 
 # ------------------------------------------------------------------------------
 # SETUP GENERAL APPLICATION
@@ -21,15 +22,12 @@ app.debug = True
 # ------------------------------------------------------------------------------
 
 # Slack/Mongo Handler
-handler = SlackLogHandler()
-print(app.config['SLACK_WEBHOOK'])
-handler.set_webhook(app.config['SLACK_WEBHOOK'])
+handler = RotatingFileHandler('battelship.log', maxBytes=10000, backupCount=1)
 handler.setLevel(logging.INFO)
 app.logger.addHandler(handler)
 
-
 # ------------------------------------------------------------------------------
-# SETUP MONGO DB 
+# SETUP MONGO DB
 # ------------------------------------------------------------------------------
 
 db = MongoEngine(app)
