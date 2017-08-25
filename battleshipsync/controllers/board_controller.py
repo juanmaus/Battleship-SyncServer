@@ -143,7 +143,7 @@ def post_torpedo(board_id):
                 ), int(HTTPStatus.BAD_REQUEST)
         else:
             return jsonify({'Error': 'Invalid torpedo operation',
-                                     'Message': 'Dude, you cannot shoot your own crappy boats nor steal identities...!'}).get(), int(HTTPStatus.BAD_REQUEST)
+                                     'Message': 'Dude, you cannot shoot your own crappy boats nor steal identities...!'}), int(HTTPStatus.BAD_REQUEST)
     else:
         return jsonify(
             ErrorResponse(
