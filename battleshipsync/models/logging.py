@@ -22,7 +22,7 @@ class LogEntry(Document):
     logger = StringField(max_length=500, required=False)
     level = StringField(max_length=500, required=False)
     trace = StringField(max_length=4000, required=False)
-    message = StringField(max_length=1024, required=True)
+    message = StringField(max_length=4096, required=True)
     path = StringField(max_length=500, required=False)
     method = StringField(max_length=100, required=False)
     ip = StringField(max_length=20, required=False)
