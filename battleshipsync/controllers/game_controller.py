@@ -59,18 +59,15 @@ def get_game(game_id):
 @jwt_required()
 @enable_jsonp
 def get_game_list():
-    keys= []
+    availible_games = []
     games_data = persistance_provider.get('games')
-    from battleshipsync.models.dao.game_index import move_to_next_player
-    # If there are no players, then we create an empty list
-    #move_to_next_player("cad87fe9-99e8-4665-aae7-b1a96a1f4234") Used to test function
     if games_data is not None:
         games = json.loads(games_data)
         try:
             for game in games:
                 if game["game_status"] == str(GameStatus.WAITING_FOR_PLAYERS):
-                    keys.append(game["game_id"])
-            return jsonify(keys)
+                    availible_games.append(game)
+            return jsonify(availible_games)
         except:
             return jsonify({
                 "Error": "Unable to fetch games"
