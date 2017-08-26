@@ -5,7 +5,7 @@ from battleshipsync.models.player import Player
 from battleshipsync import redis_store as redis
 from battleshipsync.models.dao.player_index import register_player
 from flask_jwt import jwt_required, current_identity
-
+import json
 
 # ---------------------------------------------------------------------------------------
 # POST PLAYER
@@ -24,6 +24,7 @@ def post_game_player(game_id):
     user_id = current_identity.id
     player_data = request.get_json()
     if player_data is not None and user_id is not None:
+        print("Data entering is: " + json.dumps(player_data))
         player = Player(user_id=user_id, game_id=game_id, persistence_provider=redis)
         if player.register(nickname=player_data['nickname'], is_human=player_data['is_human']):
             if register_player(player.export_state()):
