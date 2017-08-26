@@ -24,7 +24,7 @@ def post_game_player(game_id):
     user_id = current_identity.id
     player_data = request.get_json()
     if player_data is not None and user_id is not None:
-        print("Data entering is: " + json.dumps(player_data))
+        print(player_data)
         player = Player(user_id=user_id, game_id=game_id, persistence_provider=redis)
         if player.register(nickname=player_data['nickname'], is_human=player_data['is_human']):
             if register_player(player.export_state()):
