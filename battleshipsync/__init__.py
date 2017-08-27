@@ -17,7 +17,7 @@ __version__ = '1.0'
 app = Flask('battleshipsync')
 app.config.from_object('config')
 app.debug = True
-CORS(app)
+#CORS(app)
 # ------------------------------------------------------------------------------
 # SETUP LOGGING
 # ------------------------------------------------------------------------------
