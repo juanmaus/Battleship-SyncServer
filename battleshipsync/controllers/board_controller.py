@@ -20,7 +20,7 @@ import json
 def get_board(board_id):
     """
         This endpoint allows a user to get it's current board. This method will only allow
-        the player's own board. If another player's board is attempted to access, then a 
+        the player's own board. If another player's board is attempted to access, then a
         401 Not authorized error code should be returned.
         :return: A json representation of the player's board.
     """
@@ -60,23 +60,23 @@ def post_torpedo(board_id):
 
     """
         ---------------------------------------------------------------------------------
-        This method allows to drop a torpedo in a given pair of coordinates on a board belonging 
+        This method allows to drop a torpedo in a given pair of coordinates on a board belonging
         to an opponent that is currently playing within the same game instance. The boards are
-        uniquely identified by a key. 
-            
-        In order to specify the coordinates that are going to indicate the location where 
-        the torpedo is going to be sent, the following payload must be provided (example 
+        uniquely identified by a key.
+
+        In order to specify the coordinates that are going to indicate the location where
+        the torpedo is going to be sent, the following payload must be provided (example
         values):
-        
+
             {
                 "x_coordinate": 3,
-                "y_coordinate": 4, 
+                "y_coordinate": 4,
                 "shooter": "56c142a9-8946-4b50-9e12-e12867573d3f"
             }
-        
-        :param board_id: The id of the board to where the 
-        :return: A json payload containing the result of the bombing operation in the 
-                 given board. 
+
+        :param board_id: The id of the board to where the
+        :return: A json payload containing the result of the bombing operation in the
+                 given board.
         ---------------------------------------------------------------------------------
     """
 
@@ -145,6 +145,11 @@ def post_torpedo(board_id):
                                 'Message': 'Players in transaction could not be found'
                             }
                         )
+                else:
+                    app.logger.error('Some stupid player tried to shoot an already shot location')
+                    return jsonify({
+                        "result_code": -1
+                    }), HTTPStatus.BAD_REQUEST
             else:
                 app.logger.error('Some stupid player tried to shoot a torpedo into a non-valid location')
                 return jsonify(
