@@ -21,7 +21,7 @@ def register_player(player):
     players = []
     # If there are no players, then we create an empty list
     if players_data is not None:
-        players = json.loads(players_data)
+        players = json.loads(players_data.decode('utf-8'))
     players.append(player)
     redis.set('players', json.dumps(players))
     # Now we create a board for the player once it has been registered on a game
