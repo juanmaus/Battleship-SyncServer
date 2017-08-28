@@ -86,7 +86,7 @@ def post_torpedo(board_id):
     # First we check if the board instance actually exists within redis store.
     app.logger.info('Checking board...')
     if board_data is not None:
-        brt = json.loads(board_data)
+        brt = json.loads(board_data.decode('utf-8'))
         # Next we verify the user is not trying to send torpedo to his own board.
 
         board = Board(
@@ -106,6 +106,9 @@ def post_torpedo(board_id):
 
         app.logger.info('Getting receiver...')
         receiver = get_player(board.get_player_id())
+
+        print('BOARD OWNER' ,board.get_owner_id())
+        print('CURRENT IDENTITY', current_identity.id)
 
         if board.get_owner_id() != current_identity.id and current_identity.id == shooter.get_owner():
             app.logger.info('Seems its working...')
@@ -168,5 +171,3 @@ def post_torpedo(board_id):
                 'The provided board is does not correspond to a valid board'
             ).get()
         ), int(HTTPStatus.NOT_FOUND)
-
-

@@ -17,14 +17,13 @@ def post_game_player(game_id):
     """
         To join a game, a new player must be created within the context of the
         game, In order to do this, this endpoint is provided so a new player can
-        be generated in a Game instance. 
+        be generated in a Game instance.
 
         TODO add validation for repeated users
     """
 
     user_id = current_identity.id
-    data_str = request.get_json()
-    player_data = json.loads(data_str)
+    player_data = request.get_json()
     if player_data is not None and user_id is not None:
 
         print(player_data)
@@ -61,6 +60,7 @@ def get_player(player_id):
 
     if player_id is not None:
         user_id = current_identity.id
+       
         player = Player(user_id=user_id, game_id=None, persistence_provider=redis)
         if player.load(player_id=player_id):
             return jsonify(player.export_state()), HTTPStatus.OK

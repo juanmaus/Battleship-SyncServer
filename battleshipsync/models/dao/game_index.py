@@ -81,7 +81,7 @@ def update_game_index(game_id, gameinfo):
     newgames = []
     # If there are no games, then we create an empty list
     if games_data is not None:
-        games = json.loads(games_data)
+        games = json.loads(games_data.decode('utf-8'))
         key = None
         try:
             for game in games:
@@ -95,9 +95,3 @@ def update_game_index(game_id, gameinfo):
     games = None
     newgames = None
     return True
-
-
-
-
-
-

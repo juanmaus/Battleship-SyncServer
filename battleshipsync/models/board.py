@@ -198,15 +198,15 @@ class Board:
             Given a json string that contains a persistent state of a board, deserializes
             it into a dictionary and reads all the properties in order to load board state
             into current class instance so updating the board's state can be done using the
-            class' API abstraction. 
-            
+            class' API abstraction.
+
             :param board_data: json string containing the representation of the board's state
             :return: None
             -----------------------------------------------------------------------------
         """
 
         if board_data is not None:
-            board_state = json.loads(board_data)
+            board_state = json.loads(board_data.decode('utf-8'))
             size = 10
             print('[DEBUG]: board state: ' + str(board_state))
             self.__board = []

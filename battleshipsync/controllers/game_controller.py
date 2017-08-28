@@ -4,7 +4,6 @@ from flask import request, jsonify, json
 from battleshipsync import redis_store as persistance_provider
 from battleshipsync.extensions.jsonp import enable_jsonp
 from battleshipsync.extensions.error_handling import ErrorResponse
-from battleshipsync.models.dao.game_index import add_player
 from battleshipsync.models.game import Game, GameStatus, GameMode
 from flask_jwt import jwt_required, current_identity
 
