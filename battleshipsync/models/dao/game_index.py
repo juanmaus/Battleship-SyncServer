@@ -51,16 +51,29 @@ def move_to_next_player(game_id):
         Updates a game(entity and DAO) to move to the next player
 
         :param game_id: gameId
-        :return: Next player id to move or None if error
+        :return: True if moved successfully to next player or only 1 player alive
     """
+    from battleshipsync.helpers.player_helper import get_player
     game = Game(None, None, persistence_provider=persistence_provider)  # instance as null to later load from id
     game.load(game_id)
+
+    alive_players = []
+    for player in game.players:
+        if get_player(player).is_alive():
+            alive_players.append(player)
+
+    if len(alive_players) is 1:
+        game.set_winner(alive_players[0])
+        return True
 
     pool = cycle(game.players)
     for player in pool:
         if player == game.moves_next:
-            game.moves_next = next(pool)
-            break
+            next_player = next(pool)
+            game.moves_next = next_player
+            if get_player(next_player).is_alive():
+                break
+
 
     if game.save():
         update_game_index(game_id=game_id, gameinfo=game.static_metadata())
