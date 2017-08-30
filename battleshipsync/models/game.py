@@ -159,7 +159,7 @@ class Game:
             This method gets if the game has a winner set
             :return: Bool true if the winner is set
         """
-        if len(self.player_layout) == 0:
+        if len(self.winner) > 0:
             return True
         else:  # Redundant else but legible blablabla..
             return False
@@ -172,10 +172,10 @@ class Game:
             This method sets if game has winner(ONLY IF IT'S ACTIVE AND NOT SET?
             :return: Bool true if the winner was properly set and saved
         """
-        if Game.game_status is GameStatus.ACTIVE:
+        if self.game_status == str(GameStatus.ACTIVE):
             if not self.has_winner():
                 self.winner = winner
-                Game.game_status = GameStatus.FINISHED
+                self.game_status = GameStatus.FINISHED
                 self.save()
                 return True
             else:
