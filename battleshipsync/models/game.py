@@ -72,6 +72,7 @@ class Game:
         self.timestamp = datetime.datetime.now()
         self.game_status = GameStatus.WAITING_FOR_PLAYERS
         self.owner = ""
+        self.winner = ""
         self.moves_next = ""
         self.mode = mode
         self.player_layout = player_layout
@@ -151,13 +152,44 @@ class Game:
             return False
 
     # -----------------------------------------------------------------------------------
+    # METHOD CHECK HAS WINNER
+    # -----------------------------------------------------------------------------------
+    def has_winner(self):
+        """
+            This method gets if the game has a winner set
+            :return: Bool true if the winner is set
+        """
+        if len(self.player_layout) == 0:
+            return True
+        else:  # Redundant else but legible blablabla..
+            return False
+
+    # -----------------------------------------------------------------------------------
+    # METHOD SET WINNER
+    # -----------------------------------------------------------------------------------
+    def set_winner(self, winner):
+        """
+            This method sets if game has winner(ONLY IF IT'S ACTIVE AND NOT SET?
+            :return: Bool true if the player layout count is 0
+        """
+        if Game.game_status is GameStatus.ACTIVE:
+            if not self.has_winner():
+                self.winner = winner
+                Game.game_status = GameStatus.FINISHED
+                return True
+            else:
+                return False
+        else:
+            return False
+
+        # -----------------------------------------------------------------------------------
     # METHOD REGISTER
     # -----------------------------------------------------------------------------------
     def register(self):
         from battleshipsync.models.dao.game_index import register_game
         """
             Registers a new game on a game index for filtering purposes
-            :return: True if the player was registered successfully
+            :return: True if the game was registered successfully
         """
         if self.save():
             return register_game(self.static_metadata())
@@ -180,6 +212,7 @@ class Game:
             "mode": str(self.mode),
             "owner": self.owner,
             "moves_next": self.moves_next,
+            "winner": self.winner,
             "player_layout": self.player_layout,
             "players": self.players
         }
@@ -200,6 +233,7 @@ class Game:
             "open_spots": self.player_layout,
             "game_status": str(self.game_status),
             "moves_next": self.moves_next,
+            "winner": self.winner,
             "players": self.players
         }
 
@@ -231,6 +265,7 @@ class Game:
             self.mode = game_data['mode']
             self.owner = game_data['owner']
             self.moves_next = game_data['moves_next']
+            self.winner = game_data['winner']
             self.player_layout = game_data['player_layout']
             self.players = game_data['players']
             return 0
