@@ -12,7 +12,7 @@ class Player:
         -----------------------------------------------------------------------------
          A player establishes a relationship between a user of the game and an specific
          instance of Game. The player model has the responsibility of keeping player's
-         scores such as the amount of points gained and the amount of fleet value 
+         scores such as the amount of points gained and the amount of fleet value
          remaining in his board. Player also stores the associated nickname with a player
          -----------------------------------------------------------------------------
     """
@@ -38,10 +38,10 @@ class Player:
     def __init__(self, user_id, game_id, persistence_provider):
         """
             -----------------------------------------------------------------------------
-            To create an instance of player it is only necessary to provide the id of the 
-            game and the id of the user who owns the player's instance. 
-            :param user_id: 
-            :param game_id: 
+            To create an instance of player it is only necessary to provide the id of the
+            game and the id of the user who owns the player's instance.
+            :param user_id:
+            :param game_id:
             -----------------------------------------------------------------------------
         """
         self.__user_id = user_id
@@ -110,7 +110,7 @@ class Player:
             "current_fleet_value": self.__current_fleet_value,
             "nickname": self.__nick_name,
             "alive": self.__alive,
-            "is_human": self.__is_human, 
+            "is_human": self.__is_human,
             "board_id": self.__board_id
         }
 
@@ -140,7 +140,7 @@ class Player:
     def json(self):
         """
             -----------------------------------------------------------------------------
-            Creates a json string representation of current instance of player. 
+            Creates a json string representation of current instance of player.
             :return: json string
             -----------------------------------------------------------------------------
         """
@@ -152,8 +152,8 @@ class Player:
     def load(self, player_id):
         """
             -----------------------------------------------------------------------------
-            Loads an instance of player with the data retrieved from redis in case the 
-            player_id provided is valid 
+            Loads an instance of player with the data retrieved from redis in case the
+            player_id provided is valid
             :param player_id: The player's id
             :return: True if loaded and false if not loaded
             -----------------------------------------------------------------------------
@@ -179,8 +179,8 @@ class Player:
     def get_owner(self):
         """
             -----------------------------------------------------------------------------
-            Gets the owner of the player. 
-            :return: 
+            Gets the owner of the player.
+            :return:
             -----------------------------------------------------------------------------
         """
         return self.__user_id
@@ -191,8 +191,8 @@ class Player:
     def get_player_id(self):
         """
             -----------------------------------------------------------------------------
-            Gets the id of the player. 
-            :return: 
+            Gets the id of the player.
+            :return:
             -----------------------------------------------------------------------------
         """
         return self.__player_id
@@ -203,12 +203,12 @@ class Player:
     def get_game_id(self):
         """
             -----------------------------------------------------------------------------
-            Gets the id of the game. 
-            :return: 
+            Gets the id of the game.
+            :return:
             -----------------------------------------------------------------------------
         """
         return self.__game_id
-        
+
     # -----------------------------------------------------------------------------------
     # METHOD GET BOARD ID
     # -----------------------------------------------------------------------------------
@@ -216,7 +216,7 @@ class Player:
         """
             -----------------------------------------------------------------------------
             Gets the id of the player's board
-            :return: 
+            :return:
             -----------------------------------------------------------------------------
         """
         return self.__board_id
@@ -227,9 +227,9 @@ class Player:
     def save(self):
         """
             -----------------------------------------------------------------------------
-            Persists current player's state into the REDIS Store  
+            Persists current player's state into the REDIS Store
             :param redis: reference to redis store client instance
-            :return: 
+            :return:
             -----------------------------------------------------------------------------
         """
         if self.__persistence_provider is not None:
@@ -253,15 +253,26 @@ class Player:
         return False
 
     # -----------------------------------------------------------------------------------
+    # METHOD IS ALIVE
+    # -----------------------------------------------------------------------------------
+    def is_alive(self):
+        """
+            -----------------------------------------------------------------------------
+            :return: True if player is dead lol
+            -----------------------------------------------------------------------------
+        """
+        return self.__alive
+
+    # -----------------------------------------------------------------------------------
     # METHOD UPLOAD FLEET VALUE
     # -----------------------------------------------------------------------------------
     def update_fleet_value(self, amount):
         """
             -----------------------------------------------------------------------------
-            Updates the current player's fleet value when someone shoots to his/her board 
+            Updates the current player's fleet value when someone shoots to his/her board
             and hits one of his ships.
             :param amount: The amount of damage received in terms of fleet value
-            :return: True if updated successfully 
+            :return: True if updated successfully
             -----------------------------------------------------------------------------
         """
         if self.__current_fleet_value >= amount:
