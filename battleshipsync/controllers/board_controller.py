@@ -117,12 +117,12 @@ def post_torpedo(board_id):
                     # We update the state on the redis store
                     board.save()
                     app.logger.info('Torpedo was sent: shooter: ['+current_identity.id + '] destination ->> [' + board.get_player_id() + ']')
-                    if shooter.is_alive() and receiver.is_alive():
+                    if not shooter.is_alive() or not receiver.is_alive():
                         app.logger.error('Somebody is wasting bullets on a dead player')
                         return jsonify(
                             ErrorResponse(
                                 'Trying to torpedo dead player',
-                                'You cannot shoot a dead player, why would you even do that?'
+                                'Either you are dead, or you\'re tryiing to shoot a dead player;'
                             ).get()
                         ), int(HTTPStatus.BAD_REQUEST)
 
