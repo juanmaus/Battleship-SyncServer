@@ -53,37 +53,34 @@ def hits_boat(
     if direction == 'UP':
         first_square = position['y']
 
-        for currentY in range(first_square + 1 - boat_size, first_square
-                              + 1):
+        for currentY in range(first_square + 1 - boat_size, first_square + 1):
             if board_matrix[currentY][position['x']] != 0:
-                is_hitting_boat = True
-                break
+                return True
+
     elif direction == 'DOWN':
 
         first_square = position['y']
 
         for currentY in range(first_square, first_square + boat_size):
             if board_matrix[currentY][position['x']] != 0:
-                is_hitting_boat = True
-                break
+                return True
     elif direction == 'RIGHT':
 
         first_square = position['x']
 
         for currentX in range(first_square, first_square + boat_size):
             if board_matrix[position['y']][currentX] != 0:
-                is_hitting_boat = True
-                break
+                return True
+
     elif direction == 'LEFT':
 
         first_square = position['x']
 
-        for currentX in range(first_square + 1 - boat_size, first_square
-                              + 1):
+        for currentX in range(first_square + 1 - boat_size, first_square + 1):
             if board_matrix[position['y']][currentX] != 0:
-                is_hitting_boat = True
-                break
+                return True
 
+    return False
 
 # ---------------------------------------------------------------------------------------
 #  FUNCTION POPULATE BOARD
@@ -170,8 +167,6 @@ def get_random_direction(
     board_size = len(board_matrix)
     index = randrange(0, len(directions))
     direction = directions[index]
-    hasSpace = True
-    isHittingBoat = False
 
     if not board_has_space(direction, position, boat_size, board_size):
         del directions[index]
