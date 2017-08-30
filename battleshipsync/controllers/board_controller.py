@@ -107,11 +107,8 @@ def post_torpedo(board_id):
         app.logger.info('Getting receiver...')
         receiver = get_player(board.get_player_id())
 
-        print('BOARD OWNER' ,board.get_owner_id())
-        print('CURRENT IDENTITY', current_identity.id)
-
         if board.get_owner_id() != current_identity.id and current_identity.id == shooter.get_owner():
-            app.logger.info('Seems its working...')
+            app.logger.info('Valid shooter shooting valid board')
 
             if torpedo_coordinates is not None:
                 result = board.shoot(torpedo_coordinates['x_coordinate'], torpedo_coordinates['y_coordinate'])
@@ -120,9 +117,16 @@ def post_torpedo(board_id):
                     # We update the state on the redis store
                     board.save()
                     app.logger.info('Torpedo was sent: shooter: ['+current_identity.id + '] destination ->> [' + board.get_player_id() + ']')
+                    if not shooter.is_alive() or not receiver.is_alive():
+                        app.logger.error('Somebody is wasting bullets on a dead player')
+                        return jsonify(
+                            ErrorResponse(
+                                'Trying to torpedo dead player',
+                                'Either you are dead, or you\'re tryiing to shoot a dead player;'
+                            ).get()
+                        ), int(HTTPStatus.BAD_REQUEST)
 
-                    if shooter is not None and receiver is not None:
-                        print('Shooter and affected found!... moving on')
+                    if shooter is not None and receiver is not None and receiver:
                         app.logger.info('Shoot result was: [' + str(result) + ']')
                         if result > 0:
                             shooter.add_points(result)
