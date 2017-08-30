@@ -170,12 +170,13 @@ class Game:
     def set_winner(self, winner):
         """
             This method sets if game has winner(ONLY IF IT'S ACTIVE AND NOT SET?
-            :return: Bool true if the player layout count is 0
+            :return: Bool true if the winner was properly set and saved
         """
         if Game.game_status is GameStatus.ACTIVE:
             if not self.has_winner():
                 self.winner = winner
                 Game.game_status = GameStatus.FINISHED
+                self.save()
                 return True
             else:
                 return False
