@@ -84,7 +84,7 @@ class Player:
         submarine = 3*3
         destroyer = 2*2
 
-        self.__current_fleet_value = carrier + destroyer + (cruise * 2) + submarine + battleship
+        self.__current_fleet_value = carrier + destroyer + cruise + submarine + battleship
         self.__points_gained = 0
         self.__alive = True
         self.__is_human = is_human
