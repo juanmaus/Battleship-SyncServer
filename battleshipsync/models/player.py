@@ -160,7 +160,7 @@ class Player:
         """
         if self.__persistence_provider is not None and player_id is not None:
             player_data = self.__persistence_provider.get(player_id)
-            player = json.loads(player_data)
+            player = json.loads(player_data.decode('utf-8'))
             self.__player_id = player_id
             self.__nick_name = player['nickname']
             self.__current_fleet_value = player['current_fleet_value']

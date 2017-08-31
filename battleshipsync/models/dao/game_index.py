@@ -20,7 +20,7 @@ def register_game(game):
     games = []
     # If there are no games, then we create an empty list
     if games_data is not None:
-        games = json.loads(games_data)
+        games = json.loads(games_data.decode('utf-8'))
     games.append(game)
     persistence_provider.set('games', json.dumps(games))
     games = None

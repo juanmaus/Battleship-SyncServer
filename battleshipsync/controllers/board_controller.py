@@ -7,6 +7,7 @@ from battleshipsync.models.dao.player_index import verify_ownership
 from battleshipsync.helpers.player_helper import get_player
 from battleshipsync.models.dao.game_index import move_to_next_player
 from battleshipsync.extensions.error_handling import ErrorResponse
+from battleshipsync.models.game import Game
 from flask_jwt import jwt_required, current_identity
 import uuid
 import json
@@ -109,6 +110,17 @@ def post_torpedo(board_id):
 
         if board.get_owner_id() != current_identity.id and current_identity.id == shooter.get_owner():
             app.logger.info('Valid shooter shooting valid board')
+
+            game = Game(None, None, persistence_provider=redis_store)#instace as null to later load from id
+            game.load(game_id=brt['game_id'])
+
+            if game.static_metadata()["moves_next"] != torpedo_coordinates['shooter']:
+                return jsonify(
+                    ErrorResponse(
+                        'Trying to shoot when its not your turn',
+                        'You are trying to shoot but its not your turn'
+                    ).get()
+                ), int(HTTPStatus.BAD_REQUEST)
 
             if torpedo_coordinates is not None:
                 result = board.shoot(torpedo_coordinates['x_coordinate'], torpedo_coordinates['y_coordinate'])
