@@ -11,7 +11,7 @@ def register_player(player):
     """
         We keep a list of player in our redis in order to check things like ownership
         between player and user and to be able to enumerate all known players. This
-        Redis key serves as an index 
+        Redis key serves as an index
 
         :param player: Dictionary of player
         :return: True player was successfully registered
@@ -44,10 +44,10 @@ def register_player(player):
 # ---------------------------------------------------------------------------------------
 def verify_ownership(player_id, user_id):
     """
-        Checks on the players index if a given player id is owned by the given user id. 
+        Checks on the players index if a given player id is owned by the given user id.
         :param player_id: The id of the player
         :param user_id:  The user who supposedly owns the given player id
-        :return: 
+        :return:
     """
     players_data = redis.get('players')
     players = []
@@ -64,5 +64,31 @@ def verify_ownership(player_id, user_id):
     except:
         return False
 
+def update_player_index(player_id, player_info):
+    """
+        Updates the persistence provider, removing a spot from it
 
+        :param player_id: Player id
+        :param player_info: full static metadata of a player
+        :return: True if game was successfully updated
+    """
+    players_data = redis.get('players')
+    players = []
+    newplayers = []
+    # If there are no games, then we create an empty list
+    if players_data is not None:
+        players = json.loads(players_data.decode('utf-8'))
+        key = None
+        try:
+            for player in players:
+                if player_id == player["player_id"]:
+                    newplayers.append(player_info)
+                else:
+                    newplayers.append(player)
+        except:
+            return False
+    redis.set('players', json.dumps(newplayers))
+    players = None
+    newplayers = None
+    return True
 

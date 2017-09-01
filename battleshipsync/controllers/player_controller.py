@@ -3,7 +3,7 @@ from flask import jsonify, request
 from battleshipsync import app, redis_store
 from battleshipsync.models.player import Player
 from battleshipsync import redis_store as redis
-from battleshipsync.models.dao.player_index import register_player
+from battleshipsync.models.dao.player_index import register_player,update_player_index
 from flask_jwt import jwt_required, current_identity
 import json
 
@@ -59,7 +59,8 @@ def get_player(player_id):
 
         player = Player(user_id=user_id, game_id=None, persistence_provider=redis)
         if player.load(player_id=player_id):
-            return jsonify(player.export_state()), HTTPStatus.OK
+            if update_player_index(player.get_player_id(), player.export_state()):
+                return jsonify(player.export_state()), HTTPStatus.OK
         else:
             return jsonify({
                 "Error": "Player not found"
