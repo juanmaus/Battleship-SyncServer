@@ -266,7 +266,7 @@ class Game:
             self.mode = game_data['mode']
             self.owner = game_data['owner']
             self.moves_next = game_data['moves_next']
-            if self.game_status is "GameStatus.FINISHED":
+            if self.game_status == str(GameStatus.FINISHED):
                 self.winner = game_data['winner']
             self.player_layout = game_data['player_layout']
             self.players = game_data['players']
