@@ -1,10 +1,19 @@
-# Garnet Flask API Boilerplate
+# BattleShip-SyncServer
 
-Author: Pedro Guzmán (pedro@subvertic.com)
+Authors: 
+Pedro Guzmán (pedro@subvertic.com)
+Juan Medrano (juanma@juanma.us)
+Felix Vazquez
 
 License: MIT License
 
 ## Description
+
+BattleShip-SyncServer is a REST-Compliant web service for playing Battleships, extending Garnet(https://github.com/OneTesseractInMultiverse/Garnet) as a base.
+
+Further documentation can be found in the docs folder, on how to use the endpoints.
+
+Server is based on a owner-player principle, so, in order to make a player, you must first create a account using the instructions below.
 
 Garnet is a basic boilerplate Flask-based application that provides some
 basic features out of the box that can be easily configured and extended. 
@@ -47,7 +56,7 @@ requests without the need of enabling CORS.
 Clone the repository in your local system:
 
 ````shell
-$ git clone https://github.com/OneTesseractInMultiverse/Garnet.git
+$ git clone https://github.com/juanmaus/Garnet.git
 ````
 
 Install dependencies:
