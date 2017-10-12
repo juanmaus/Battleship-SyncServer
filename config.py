@@ -16,7 +16,7 @@ BCRYPT_LEVEL = 12
 # ----------------------------------------------------------------
 # SLACK CONFIG
 # ----------------------------------------------------------------
-SLACK_WEBHOOK = "https://hooks.slack.com/services/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"
+SLACK_WEBHOOK = " https://hooks.slack.com/services/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 "
 #
 # ----------------------------------------------------------------
 # JWT CONFIGURATIONS
@@ -29,10 +29,7 @@ JWT_EXPIRATION_DELTA = datetime.timedelta(3200) # Set the token validity
 # ----------------------------------------------------------------
 # MongoDB configuration parameters
 MONGODB_DB = 'battleship'
-MONGODB_HOST = 'ds042459.mlab.com'
-MONGODB_PORT = 42459
-MONGODB_USERNAME = 'battleship'
-MONGODB_PASSWORD = '!Awsx1Sedc2Drfv3!'
+MONGODB_HOST = 'localhost'
 #
 # ----------------------------------------------------------------
 # REDIS CONFIGURATIONS

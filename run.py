@@ -5,13 +5,12 @@ import os
 from battleshipsync import app
 
 """
-    Garnet API is a boilerplate application that allows you to create Python + Flask API
-    applications based on a Model-View-Controller (MVC) pattern. It supports out of the
-    box interaction with Mongo DB Document Database, JWT Token Generation and Authentication,
-    basic and extensible identity model 
+    BattleShip-SyncServer is a REST-Compliant web service for playing Battleships, extending Garnet(https://github.com/OneTesseractInMultiverse/Garnet) as a base.
+    Further documentation can be found in the docs folder, on how to use the endpoints.
+    Server is based on a owner-player principle, so, in order to make a player, you must first create a account using the instructions below.
 """
 
-__author__ = "Pedro Guzman (pedro@subvertic.com)"
+__author__ = "To be set"
 __version__ = "1.0"
 
 if __name__ == '__main__':
