@@ -4,9 +4,17 @@ from flask import jsonify
 
 
 class ErrorResponse:
+
     def __init__(self, message, details):
         self.msg = message
         self.details = details
+
+    def get(self):
+        return {
+            "Error": True,
+            "msg": self.msg,
+            "details": self.details
+        }
 
     def as_json(self):
         return jsonify({
@@ -21,6 +29,13 @@ class SuccessResponse:
         self.msg = message
         self.details = details
         self.result = result
+
+    def get(self):
+        return {
+            "result": self.result,
+            "msg": self.msg,
+            "details": self.details
+        }
 
     def as_json(self):
         return jsonify({
