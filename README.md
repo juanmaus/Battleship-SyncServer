@@ -1,8 +1,8 @@
 # BattleShip-SyncServer
 
-Authors: 
-Pedro Guzmán (pedro@subvertic.com)
-Juan Medrano (juanma@juanma.us)
+Authors:  
+Pedro Guzmán (pedro@subvertic.com)  
+Juan Medrano (juanma@juanma.us)  
 Felix Vazquez
 
 License: MIT License
